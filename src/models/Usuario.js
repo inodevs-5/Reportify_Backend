@@ -1,4 +1,5 @@
 const mongoose = require("mongoose")
+const {empresaSchema} = require('./Empresa')
 
 const { Schema } = mongoose
 

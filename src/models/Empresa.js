@@ -19,7 +19,7 @@ const empresaSchema = new Schema({
     }
 )
 
-const RO = mongoose.model("Empresa", empresaSchema)
+const Empresa = mongoose.model("Empresa", empresaSchema)
 
 module.exports = {
     Empresa,

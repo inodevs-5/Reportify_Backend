@@ -43,7 +43,7 @@ const roSchema = new Schema({
         },
 
         // anexos { }
-    },  { timestamps }
+    },  { timestamps: true }
 )
 
 const RO = mongoose.model("User", roSchema)

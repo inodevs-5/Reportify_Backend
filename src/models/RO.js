@@ -1,5 +1,6 @@
 const mongoose = require("mongoose")
 const {empresaSchema} = require('./Empresa')
+const {usuarioSchema} = require('./Usuario')
 
 const { Schema } = mongoose
 
@@ -26,8 +27,23 @@ const roSchema = new Schema({
             type: String,
             required: true
         },
+        cliente : {
+            type: usuarioSchema,
+            required: true
+        },
+        suporte : {
+            type: usuarioSchema,
+            required: true
+        },
+        status : {
+            type: String,
+            enum: ['Tratado', 'Em tratamento', 'Pendente', 'Resolvido', 'Requisição inválida'],
+            required: true,
+            default: 'Pendente'
+        },
+
         // anexos { }
-    }
+    },  { timestamps }
 )
 
 const RO = mongoose.model("User", roSchema)

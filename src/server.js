@@ -12,6 +12,7 @@ const conn = require("./db/conn")
 conn()
 
 const routes = require("./routes/router")
+app.use("/", routes)
 
 port = process.env.PORT || 3000
 

@@ -46,8 +46,6 @@ const roSchema = new Schema({
     },  { timestamps: true }
 )
 
-const RO = mongoose.model("User", roSchema)
+const RO = mongoose.model("RO", roSchema)
 
-module.exports = {
-    RO
-}
+module.exports = RO

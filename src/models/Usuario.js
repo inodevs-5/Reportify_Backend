@@ -20,13 +20,11 @@ const usuarioSchema = new Schema({
             default: 'cliente'
         },
         empresa: {
-            type: empresaSchema,
-            required: true
+            type: empresaSchema
         },
         senha: {
             type: String,
-            required: true,
-            select: false
+            required: true
         },
     }
 )

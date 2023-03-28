@@ -1,0 +1,26 @@
+
+POST http://localhost:3000/ro
+Content-Type: application/json
+
+{
+    "contrato": "testando",
+    "orgao": "Teste de aplicação",
+    "fase": "pendente",
+    "dataRegistro": "testando",
+    "horaRegistro": "testando",
+    "numroOcorrencia": "testando",
+    "nomeRelator": "testando",
+    "nomeResponsavel": "testando",
+    "colaboradorIACIT": "testando",
+    "class_defeito": "hardware",
+    "versaoBaseDados": "testando",
+    "versaoSoftware": "testando",
+    "logsAnexado": "testando",
+    "equipamento": "testando",
+    "equipPosicao": "testando",
+    "partNumber": "testando",
+    "serialNumber": "testando",
+    "tituloOcorrencia": "testando",
+    "descricaoOcorrencia": "testando",
+    "procedTecnicos": "testando"
+}

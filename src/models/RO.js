@@ -5,44 +5,89 @@ const {usuarioSchema} = require('./Usuario')
 const { Schema } = mongoose
 
 const roSchema = new Schema({
-        empresa: {
-            type: empresaSchema,
-            required: true
-        },
-        titulo: {
-            type: String,
-            required: true,
-        },
-        descricao: {
-            type: String,
-            required: true,
-        },
-        prioridade: {
-            type: String,
-            enum: ['alta', 'media', 'baixa'],
-            required: true,
-            default: 'baixa'
-        }, 
-        contatoColab : {
-            type: String,
-            required: true
-        },
-        cliente : {
-            type: usuarioSchema,
-            required: true
-        },
-        suporte : {
-            type: usuarioSchema,
-            required: true
-        },
-        status : {
-            type: String,
-            enum: ['Tratado', 'Em tratamento', 'Pendente', 'Resolvido', 'Requisição inválida'],
-            required: true,
-            default: 'Pendente'
-        },
 
-        // anexos { }
+        contrato: {
+            type: String,
+            required: true
+        },
+        orgao: {
+            type: String,
+            required: true
+        },
+        fase: {
+            type: String,
+            enum: ['pendente', 'em andamento', 'concluido'],
+            required: true,
+            default: 'pendente'
+        }, 
+        dataRegistro: {
+            type: String,
+            required: true
+        },
+        horaRegistro: {
+            type: String,
+            required: true,
+        },
+        numroOcorrencia: {
+            type: String,
+            required: true,
+        },
+        nomeRelator: {
+            type: String,
+            required: true,
+        },
+        nomeResponsavel: {
+            type: String,
+            required: true,
+        },
+        colaboradorIACIT: {
+            type: String,
+            required: true,
+        },
+        class_defeito: {
+            type: String,
+            enum: ['hardware', 'sofware'],
+            required: true,
+            default: 'hardware'
+        },
+        //Opções softaware
+        versaoBaseDados: {
+            type: String,
+        },
+        versaoSoftware: {
+            type: String,
+        },
+        logsAnexado: {
+            type: String,
+        },
+        //Opções Hardware
+        equipamento: {
+            type: String,
+        },
+        equipPosicao : {
+            type: String,
+        },
+        partNumber : {
+            type: String,
+        },
+        serialNumber : {
+            type: String,
+        },
+        //-----
+        tituloOcorrencia : {
+            type: String,
+            required: true,
+            
+        },
+        descricaoOcorrencia : {
+            type: String,
+            required: true,
+            
+        },
+        procedTecnicos : {
+            type: String,
+            required: true,
+        },
     },  { timestamps: true }
 )
 

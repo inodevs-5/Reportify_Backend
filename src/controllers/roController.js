@@ -113,6 +113,19 @@ const roController = {
             res.status(500).json({msg: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"})
         }
     },
+
+    search: async(req, res) => {
+        try {
+            const { search } = req.params
+
+            const ros = await RO.find({tituloOcorrencia: RegExp(search, 'i')})
+
+            res.json(ros)
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({msg: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"})
+        }
+    }
 }
 
 module.exports = roController

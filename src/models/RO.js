@@ -46,7 +46,7 @@ const roSchema = new Schema({
         },
         class_defeito: {
             type: String,
-            enum: ['hardware', 'sofware'],
+            enum: ['hardware', 'software'],
             required: true,
             default: 'hardware'
         },

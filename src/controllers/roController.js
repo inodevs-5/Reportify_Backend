@@ -1,6 +1,5 @@
 const RO = require("../models/RO")
 const mongoose = require('mongoose')
-const { upload } = require("../config/gridFsConfig")
 
 let gfs
 const connect = mongoose.createConnection(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -62,8 +61,6 @@ const roController = {
             if (!horaRegistro) {
                 return res.status(422).json({msg: 'A hora do registro é obrigatório para o campo.'})
             }
-
-            
             if (!numroOcorrencia) {
                 return res.status(422).json({msg: 'O número da ocorrência é obrigatório para o campo.'})
             }
@@ -103,7 +100,16 @@ const roController = {
                 });
             }
 
+            const roAnterior = await RO.findOne().sort({id_ro: -1});
+
+            if (roAnterior && roAnterior.id_ro) {
+                id_ro = roAnterior.id_ro + 1;
+            } else {
+                id_ro = 1
+            }
+
             const response = await RO.create({ 
+                id_ro,
                 contrato,
                 orgao, 
                 fase, 

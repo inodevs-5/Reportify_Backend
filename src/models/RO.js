@@ -7,6 +7,10 @@ const { Schema } = mongoose
 
 const roSchema = new Schema({
 
+        id_ro: {
+            type: Number,
+            required: true
+        },
         contrato: {
             type: String,
             required: true

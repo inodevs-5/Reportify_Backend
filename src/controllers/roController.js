@@ -1,4 +1,14 @@
 const RO = require("../models/RO")
+const mongoose = require('mongoose')
+const { upload } = require("../config/gridFsConfig")
+
+let gfs
+const connect = mongoose.createConnection(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true });
+connect.once('open', () => {
+    gfs = new mongoose.mongo.GridFSBucket(connect.db, {
+        bucketName: "anexos"
+    });
+});
 
 const roController = {
     
@@ -28,7 +38,6 @@ const roController = {
                 class_defeito, 
                 versaoBaseDados, 
                 versaoSoftware, 
-                logsAnexado,
                 equipamento,
                 equipPosicao,
                 partNumber,
@@ -83,6 +92,16 @@ const roController = {
                 return res.status(422).json({msg: 'Os procedimentos tecnicos são obrigatórios para o campo.'})
             }
 
+            const anexos = []
+            if (req.files) {
+                req.files.forEach(async e => {
+                    let anexo = {
+                        nomeAnexo: e.filename,
+                        idAnexo: e.id,
+                    };
+                    anexos.push(anexo)
+                });
+            }
 
             const response = await RO.create({ 
                 contrato,
@@ -97,7 +116,6 @@ const roController = {
                 class_defeito, 
                 versaoBaseDados, 
                 versaoSoftware, 
-                logsAnexado,
                 equipamento,
                 equipPosicao,
                 partNumber,
@@ -105,6 +123,7 @@ const roController = {
                 tituloOcorrencia,
                 descricaoOcorrencia,
                 procedTecnicos,
+                logsAnexado: anexos
             })
 
             res.status(201).json({response, msg: "Registro de Ocorrência criado com sucesso!"})
@@ -125,7 +144,24 @@ const roController = {
             console.log(error)
             res.status(500).json({msg: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"})
         }
-    }
+    },
+
+    download: async(req, res) => {
+        try {
+            const { id } = req.params
+            
+            gfs.find({ _id: new mongoose.Types.ObjectId(id) }).toArray((err, files) => {
+                if (!files[0] || files.length === 0) {
+                    return res.status(200).json({msg: "Arquivo não encontrado!"});
+                }
+
+                gfs.openDownloadStream(new mongoose.Types.ObjectId(id)).pipe(res);
+            });
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({msg: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"})
+        }
+    },
 }
 
 module.exports = roController

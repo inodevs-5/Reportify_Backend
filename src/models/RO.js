@@ -1,6 +1,7 @@
 const mongoose = require("mongoose")
 const {empresaSchema} = require('./Empresa')
 const {usuarioSchema} = require('./Usuario')
+const { anexoSchema } = require("./Anexo")
 
 const { Schema } = mongoose
 
@@ -58,7 +59,7 @@ const roSchema = new Schema({
             type: String,
         },
         logsAnexado: {
-            type: String,
+            type: [anexoSchema]
         },
         //Opções Hardware
         equipamento: {

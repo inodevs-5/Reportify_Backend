@@ -39,7 +39,9 @@ const loginController = {
                 secret,
             )
 
-            res.status(200).json({msg: 'Autenticação realizada com sucesso', token})
+            delete usuario._doc.password
+
+            res.status(200).json({msg: 'Autenticação realizada com sucesso', usuario, token})
         } catch (error) {
             console.log(error)
             res.status(500).json({msg: "Aconteceu um erro no servidor, tente novamente mais tarde"})     

@@ -8,8 +8,11 @@ app.use(cors())
 
 app.use(express.json())
 
-const conn = require("./db/conn")
+const conn = require("./config/connDB")
 conn()
+
+const routes = require("./routes/router")
+app.use("/", routes)
 
 port = process.env.PORT || 3000
 

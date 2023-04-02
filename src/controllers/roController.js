@@ -28,9 +28,6 @@ const roController = {
                 contrato,
                 orgao, 
                 fase, 
-                dataRegistro, 
-                horaRegistro, 
-                numroOcorrencia, 
                 nomeRelator, 
                 nomeResponsavel, 
                 colaboradorIACIT, 
@@ -44,8 +41,10 @@ const roController = {
                 tituloOcorrencia,
                 descricaoOcorrencia,
                 procedTecnicos,
+                posGradRelator,
+                posGradResponsavel
             } = req.body
-
+            
             if (!contrato) {
                 return res.status(422).json({msg: 'O número do contrato é obrigatório.'})
             }
@@ -66,50 +65,94 @@ const roController = {
             // }
 
             if (!nomeRelator) {
-                return res.status(422).json({msg: 'O nome do relator é obrigatório para o campo.'})
+                return res.status(422).json({msg: 'O nome do relator é obrigatório.'})
             }
 
             if (!nomeResponsavel) {
-                return res.status(422).json({msg: 'O nome do responsavel é obrigatório para o campo.'})
+                return res.status(422).json({msg: 'O nome do responsavel é obrigatório.'})
             }
 
             // if (!colaboradorIACIT) {
-            //     return res.status(422).json({msg: 'O nome do colaborador IACIT é obrigatório para o campo.'})
+            //     return res.status(422).json({msg: 'O nome do colaborador IACIT é obrigatório.'})
             // }
 
             if (!tituloOcorrencia) {
-                return res.status(422).json({msg: 'O titulo da ocorrência é obrigatório para o campo.'})
+                return res.status(422).json({msg: 'O titulo da ocorrência é obrigatório.'})
             }
 
-            if (!descricaoOcorrencia) {
-                return res.status(422).json({msg: 'A descrição da ocorrência é obrigatório para o campo.'})
+            // if (!descricaoOcorrencia) {
+            //     return res.status(422).json({msg: 'A descrição da ocorrência é obrigatório.'})
+            // }
+
+            if (!posGradRelator) {
+                return res.status(422).json({msg: 'O POS./DRAD do relator é obrigatório.'})
+            }
+
+            if (!posGradResponsavel) {
+                return res.status(422).json({msg: 'O POS./DRAD do responsável é obrigatório.'})
             }
 
             // if (!procedTecnicos) {
-            //     return res.status(422).json({msg: 'Os procedimentos tecnicos são obrigatórios para o campo.'})
+            //     return res.status(422).json({msg: 'Os procedimentos tecnicos são obrigatórios.'})
             // }
 
+            if (!class_defeito) {
+                return res.status(422).json({msg: 'A classe do defeito é obrigatório.'})
+            }
+
+            
+            if (class_defeito == 'hardware') {
+                if (!equipamento) {
+                    return res.status(422).json({msg: 'O equipamento equipamento é obrigatório.'})
+                }
+    
+                if (!equipPosicao) {
+                    return res.status(422).json({msg: 'A posição do equipamento da ocorrência é obrigatório.'})
+                }
+    
+                if (!partNumber) {
+                    return res.status(422).json({msg: 'O Part Number é obrigatório.'})
+                }
+    
+                if (!serialNumber) {
+                    return res.status(422).json({msg: 'O Serial Number é obrigatório.'})
+                }
+            }
+
+            if (class_defeito == 'software') {
+                if (!versaoBaseDados) {
+                    return res.status(422).json({msg: 'A versão da base de dados é obrigatória.'})
+                }
+    
+                if (!versaoSoftware) {
+                    return res.status(422).json({msg: 'A versão do software é obrigatória.'})
+                }
+            }
+
+            logsAnexado = []
             if (req.files) {
-                const anexos = []
                 req.files.forEach(async e => {
                     let anexo = {
                         nomeAnexo: e.filename,
                         idAnexo: e.id,
                     };
-                    anexos.push(anexo)
+                    logsAnexado.push(anexo)
                 });
             }
 
-            const roAnterior = await RO.findOne().sort({id_ro: -1});
+            const date = new Date()
 
-            if (roAnterior && roAnterior.id_ro) {
-                id_ro = roAnterior.id_ro + 1;
-            } else {
-                id_ro = 1
+            const dataRegistro = date.getDate() + '/' + (date.getMonth() + 1) + '/'+ date.getFullYear()
+            const horaRegistro = (date.getHours()<10?'0':'') + date.getHours() + ':' + (date.getMinutes()<10?'0':'') + date.getMinutes() + ':' + date.getSeconds()
+
+            const roAnterior = await RO.findOne().sort({numroOcorrencia: -1});
+
+            let numroOcorrencia = 1
+            if (roAnterior && roAnterior.numroOcorrencia) {
+                numroOcorrencia = roAnterior.numroOcorrencia + 1;
             }
 
             const response = await RO.create({ 
-                id_ro,
                 contrato,
                 orgao, 
                 fase, 
@@ -129,7 +172,9 @@ const roController = {
                 tituloOcorrencia,
                 descricaoOcorrencia,
                 procedTecnicos,
-                logsAnexado: anexos
+                logsAnexado,
+                posGradRelator,
+                posGradResponsavel
             })
 
             res.status(201).json({response, msg: "Registro de Ocorrência criado com sucesso!"})

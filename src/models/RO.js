@@ -7,10 +7,6 @@ const { Schema } = mongoose
 
 const roSchema = new Schema({
     
-        id_ro: {
-            type: Number,
-            required: true
-        },
         contrato: {
             type: String,
             required: true
@@ -21,21 +17,21 @@ const roSchema = new Schema({
         },
         fase: {
             type: String,
-            enum: ['pendente', 'em andamento', 'concluido'],
+            // enum: ['pendente', 'em andamento', 'concluido'],
             required: true,
-            default: 'pendente'
+            // default: 'pendente'
         }, 
         dataRegistro: {
             type: String,
-            // required: true
+            required: true
         },
         horaRegistro: {
             type: String,
-            // required: true,
+            required: true,
         },
         numroOcorrencia: {
-            type: String,
-            // required: true,
+            type: Number,
+            required: true,
         },
         nomeRelator: {
             type: String,
@@ -47,13 +43,13 @@ const roSchema = new Schema({
         },
         colaboradorIACIT: {
             type: String,
-            // required: true,
+            required: true,
         },
         class_defeito: {
             type: String,
             enum: ['hardware', 'software'],
-            // required: true,
-            default: 'hardware'
+            required: true,
+            // default: 'hardware'
         },
         //Opções softaware
         versaoBaseDados: {
@@ -86,13 +82,21 @@ const roSchema = new Schema({
         },
         descricaoOcorrencia : {
             type: String,
-            required: true,
-            
+            // required: true,
         },
         procedTecnicos : {
             type: String,
             // required: true,
         },
+        posGradRelator: {
+            type: String,
+            required: true
+        }, 
+        posGradResponsavel: {
+            type: String,
+            required: true
+        }
+
     },  { timestamps: true }
 )
 

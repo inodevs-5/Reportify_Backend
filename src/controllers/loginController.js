@@ -9,17 +9,17 @@ const loginController = {
 
         //validations
         if (!email) {
-            return res.status(422).json({ msg: "O Email é Obrigatorio"})
+            return res.status(422).json({ msg: "O Email é obrigatório!"})
         }
         if (!senha) {
-            return res.status(422).json({ msg: "A senha é Obrigatorio"})
+            return res.status(422).json({ msg: "A senha é obrigatório!"})
         }
 
         //check if user exists
         const usuario = await Usuario.findOne({ email: email})
 
         if (!usuario) {
-            return res.status(404).json({ msg: "Usuario não encontrado"})
+            return res.status(404).json({ msg: "Usuário não encontrado!"})
         }
         
         //check if password match
@@ -41,7 +41,7 @@ const loginController = {
 
             delete usuario._doc.password
 
-            res.status(200).json({msg: 'Autenticação realizada com sucesso', usuario, token})
+            res.status(200).json({msg: 'Autenticação realizada com sucesso!', usuario, token})
         } catch (error) {
             console.log(error)
             res.status(500).json({msg: "Aconteceu um erro no servidor, tente novamente mais tarde"})     

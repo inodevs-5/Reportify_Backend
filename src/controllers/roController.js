@@ -54,16 +54,16 @@ const roController = {
                 return res.status(422).json({msg: 'O orgão é obrigatório.'})
             }
             
-            if (!dataRegistro) {
-                return res.status(422).json({msg: 'A data de registro é obrigatório para o campo.'})
-            }
+            // if (!dataRegistro) {
+            //     return res.status(422).json({msg: 'A data de registro é obrigatório para o campo.'})
+            // }
 
-            if (!horaRegistro) {
-                return res.status(422).json({msg: 'A hora do registro é obrigatório para o campo.'})
-            }
-            if (!numroOcorrencia) {
-                return res.status(422).json({msg: 'O número da ocorrência é obrigatório para o campo.'})
-            }
+            // if (!horaRegistro) {
+            //     return res.status(422).json({msg: 'A hora do registro é obrigatório para o campo.'})
+            // }
+            // if (!numroOcorrencia) {
+            //     return res.status(422).json({msg: 'O número da ocorrência é obrigatório para o campo.'})
+            // }
 
             if (!nomeRelator) {
                 return res.status(422).json({msg: 'O nome do relator é obrigatório para o campo.'})
@@ -73,9 +73,9 @@ const roController = {
                 return res.status(422).json({msg: 'O nome do responsavel é obrigatório para o campo.'})
             }
 
-            if (!colaboradorIACIT) {
-                return res.status(422).json({msg: 'O nome do colaborador IACIT é obrigatório para o campo.'})
-            }
+            // if (!colaboradorIACIT) {
+            //     return res.status(422).json({msg: 'O nome do colaborador IACIT é obrigatório para o campo.'})
+            // }
 
             if (!tituloOcorrencia) {
                 return res.status(422).json({msg: 'O titulo da ocorrência é obrigatório para o campo.'})
@@ -85,12 +85,12 @@ const roController = {
                 return res.status(422).json({msg: 'A descrição da ocorrência é obrigatório para o campo.'})
             }
 
-            if (!procedTecnicos) {
-                return res.status(422).json({msg: 'Os procedimentos tecnicos são obrigatórios para o campo.'})
-            }
+            // if (!procedTecnicos) {
+            //     return res.status(422).json({msg: 'Os procedimentos tecnicos são obrigatórios para o campo.'})
+            // }
 
-            const anexos = []
             if (req.files) {
+                const anexos = []
                 req.files.forEach(async e => {
                     let anexo = {
                         nomeAnexo: e.filename,

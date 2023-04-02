@@ -10,10 +10,6 @@ const anexoSchema = new Schema({
         required: true,
         type: String,
     },
-    criadoEm: {
-        default: Date.now(),
-        type: Date,
-    },
 });
 
 module.exports = { anexoSchema };

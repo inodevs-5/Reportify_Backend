@@ -6,7 +6,7 @@ const { anexoSchema } = require("./Anexo")
 const { Schema } = mongoose
 
 const roSchema = new Schema({
-
+    
         id_ro: {
             type: Number,
             required: true
@@ -27,15 +27,15 @@ const roSchema = new Schema({
         }, 
         dataRegistro: {
             type: String,
-            required: true
+            // required: true
         },
         horaRegistro: {
             type: String,
-            required: true,
+            // required: true,
         },
         numroOcorrencia: {
             type: String,
-            required: true,
+            // required: true,
         },
         nomeRelator: {
             type: String,
@@ -47,12 +47,12 @@ const roSchema = new Schema({
         },
         colaboradorIACIT: {
             type: String,
-            required: true,
+            // required: true,
         },
         class_defeito: {
             type: String,
             enum: ['hardware', 'software'],
-            required: true,
+            // required: true,
             default: 'hardware'
         },
         //Opções softaware
@@ -91,7 +91,7 @@ const roSchema = new Schema({
         },
         procedTecnicos : {
             type: String,
-            required: true,
+            // required: true,
         },
     },  { timestamps: true }
 )

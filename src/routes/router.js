@@ -2,7 +2,7 @@ const router = require("express").Router()
 const { checkToken } = require("../middlewares/authMiddleware")
 
 const rosRouter = require("./ros")
-router.use("/ro", checkToken, rosRouter)
+router.use("/ro", rosRouter)
 
 const usuariosRouter = require("./usuarios")
 router.use("/usuario", checkToken, usuariosRouter)

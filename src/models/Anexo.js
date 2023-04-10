@@ -14,6 +14,7 @@ const anexoSchema = new Schema({
         default: Date.now(),
         type: Date,
     },
+    _id: false
 });
 
 module.exports = { anexoSchema };

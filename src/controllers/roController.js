@@ -123,9 +123,9 @@ const roController = {
 
             const roAnterior = await RO.findOne().sort({numroOcorrencia: -1});
 
-            let numroOcorrencia = 1
-            if (roAnterior && roAnterior.numroOcorrencia) {
-                numroOcorrencia = roAnterior.numroOcorrencia + 1;
+            let id = 1
+            if (roAnterior && roAnterior._id) {
+                id = roAnterior._id + 1;
             }
 
             const response = await RO.create({ 
@@ -133,7 +133,7 @@ const roController = {
                 orgao, 
                 dataRegistro, 
                 horaRegistro, 
-                numroOcorrencia, 
+                _id: id, 
                 relator: {
                     id: mongoose.Types.ObjectId(idRelator),
                     nome: nomeRelator,

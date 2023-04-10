@@ -7,7 +7,7 @@ const { Schema } = mongoose
 
 const roSchema = new Schema({
 
-        numroOcorrencia: {
+        _id: {
             type: Number,
             required: true
         },
@@ -43,7 +43,8 @@ const roSchema = new Schema({
                 logsAnexado: {
                     type: [anexoSchema]
                 },
-            }
+            },
+            _id: false
         },
         opcoesHardware: {
             type: {
@@ -59,8 +60,9 @@ const roSchema = new Schema({
                 serialNumber : {
                     type: String,
                 },
-            }
-        },
+            },
+            _id: false
+        },    
         tituloOcorrencia : {
             type: String,
             required: true,            
@@ -69,24 +71,8 @@ const roSchema = new Schema({
             type: String,
         },
         relator: {
-            _id: { 
-                type: Schema.Types.ObjectId, 
-                ref: 'Usuario',
-                required: true
-            },
-            nome: {
-                type: String, 
-                ref: 'Usuario',
-                required: true
-            },
-            posGrad: {
-                type: String, 
-                required: true
-            }
-        }, 
-        responsavel: {
             type: {
-                _id: { 
+                id: { 
                     type: Schema.Types.ObjectId, 
                     ref: 'Usuario',
                     required: true
@@ -100,10 +86,32 @@ const roSchema = new Schema({
                     type: String, 
                     required: true
                 }
-            }
+            },
+            require: true,
+            _id: false
+        }, 
+        responsavel: {
+            type: {
+                id: { 
+                    type: Schema.Types.ObjectId, 
+                    ref: 'Usuario',
+                    required: true
+                },
+                nome: {
+                    type: String, 
+                    ref: 'Usuario',
+                    required: true
+                },
+                posGrad: {
+                    type: String, 
+                    required: true
+                }
+            },
+            _id: false
         },
         suporte: {
             type: roSuporteSchema,
+            _id: false
         }
     },
 )

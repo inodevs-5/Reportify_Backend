@@ -1,6 +1,4 @@
 const mongoose = require("mongoose")
-const {empresaSchema} = require('./Empresa')
-const {usuarioSchema} = require('./Usuario')
 
 const { Schema } = mongoose
 
@@ -23,6 +21,7 @@ const roSuporteSchema = new Schema ({
                     ref: 'Usuario',
                     required: true 
                 },
+                _id: false
             },
             required: true,
         },

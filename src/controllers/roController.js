@@ -116,12 +116,7 @@ const roController = {
                 });
             }
 
-            const date = new Date()
-
-            const dataRegistro = date.getDate() + '/' + (date.getMonth() + 1) + '/'+ date.getFullYear()
-            const horaRegistro = (date.getHours()<10?'0':'') + date.getHours() + ':' + (date.getMinutes()<10?'0':'') + date.getMinutes() + ':' + date.getSeconds()
-
-            const roAnterior = await RO.findOne().sort({numroOcorrencia: -1});
+            const roAnterior = await RO.findOne().sort({_id: -1});
 
             let id = 1
             if (roAnterior && roAnterior._id) {
@@ -131,8 +126,6 @@ const roController = {
             const response = await RO.create({ 
                 contrato,
                 orgao, 
-                dataRegistro, 
-                horaRegistro, 
                 _id: id, 
                 relator: {
                     id: mongoose.Types.ObjectId(idRelator),

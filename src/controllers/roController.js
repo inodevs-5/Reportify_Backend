@@ -164,9 +164,14 @@ const roController = {
         try {
             const { search } = req.params
 
-            const ros = await RO.find({tituloOcorrencia: RegExp(search, 'i')})
+            try {
+                const ros = await RO.find({$or: [{tituloOcorrencia: RegExp(search, 'i')}, {_id: search}]})  
+                res.json(ros)   
+            } catch {
+                const ros = await RO.find({tituloOcorrencia: RegExp(search, 'i')})  
+                res.json(ros) 
+            }
 
-            res.json(ros)
         } catch (error) {
             console.log(error)
             res.status(500).json({msg: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"})

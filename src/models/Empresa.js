@@ -19,9 +19,6 @@ const empresaSchema = new Schema({
     }
 )
 
-const Empresa = mongoose.model("Empresa", empresaSchema)
-
 module.exports = {
-    Empresa,
     empresaSchema
 }

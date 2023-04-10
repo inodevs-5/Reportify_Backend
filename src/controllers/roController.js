@@ -26,12 +26,12 @@ const roController = {
         try {
             const { 
                 contrato,
-                orgao, 
-                fase, 
-                nomeRelator, 
+                orgao,
+                nomeRelator,
+                idRelator, 
                 nomeResponsavel, 
-                colaboradorIACIT, 
-                class_defeito, 
+                idResponsavel,
+                classDefeito, 
                 versaoBaseDados, 
                 versaoSoftware, 
                 equipamento,
@@ -40,7 +40,6 @@ const roController = {
                 serialNumber,
                 tituloOcorrencia,
                 descricaoOcorrencia,
-                procedTecnicos,
                 posGradRelator,
                 posGradResponsavel
             } = req.body
@@ -52,17 +51,6 @@ const roController = {
             if (!orgao) {
                 return res.status(422).json({msg: 'O orgão é obrigatório.'})
             }
-            
-            // if (!dataRegistro) {
-            //     return res.status(422).json({msg: 'A data de registro é obrigatório para o campo.'})
-            // }
-
-            // if (!horaRegistro) {
-            //     return res.status(422).json({msg: 'A hora do registro é obrigatório para o campo.'})
-            // }
-            // if (!numroOcorrencia) {
-            //     return res.status(422).json({msg: 'O número da ocorrência é obrigatório para o campo.'})
-            // }
 
             if (!nomeRelator) {
                 return res.status(422).json({msg: 'O nome do relator é obrigatório.'})
@@ -72,17 +60,9 @@ const roController = {
                 return res.status(422).json({msg: 'O nome do responsavel é obrigatório.'})
             }
 
-            // if (!colaboradorIACIT) {
-            //     return res.status(422).json({msg: 'O nome do colaborador IACIT é obrigatório.'})
-            // }
-
             if (!tituloOcorrencia) {
                 return res.status(422).json({msg: 'O titulo da ocorrência é obrigatório.'})
             }
-
-            // if (!descricaoOcorrencia) {
-            //     return res.status(422).json({msg: 'A descrição da ocorrência é obrigatório.'})
-            // }
 
             if (!posGradRelator) {
                 return res.status(422).json({msg: 'O POS./DRAD do relator é obrigatório.'})
@@ -92,16 +72,12 @@ const roController = {
                 return res.status(422).json({msg: 'O POS./DRAD do responsável é obrigatório.'})
             }
 
-            // if (!procedTecnicos) {
-            //     return res.status(422).json({msg: 'Os procedimentos tecnicos são obrigatórios.'})
-            // }
-
-            if (!class_defeito) {
+            if (!classDefeito) {
                 return res.status(422).json({msg: 'A classe do defeito é obrigatório.'})
             }
 
             
-            if (class_defeito == 'hardware') {
+            if (classDefeito == 'hardware') {
                 if (!equipamento) {
                     return res.status(422).json({msg: 'O equipamento equipamento é obrigatório.'})
                 }
@@ -119,7 +95,7 @@ const roController = {
                 }
             }
 
-            if (class_defeito == 'software') {
+            if (classDefeito == 'software') {
                 if (!versaoBaseDados) {
                     return res.status(422).json({msg: 'A versão da base de dados é obrigatória.'})
                 }
@@ -155,26 +131,33 @@ const roController = {
             const response = await RO.create({ 
                 contrato,
                 orgao, 
-                fase, 
                 dataRegistro, 
                 horaRegistro, 
                 numroOcorrencia, 
-                nomeRelator, 
-                nomeResponsavel, 
-                colaboradorIACIT, 
-                class_defeito, 
-                versaoBaseDados, 
-                versaoSoftware, 
-                equipamento,
-                equipPosicao,
-                partNumber,
-                serialNumber,
+                relator: {
+                    id: mongoose.Types.ObjectId(idRelator),
+                    nome: nomeRelator,
+                    posGrad: posGradRelator
+                },
+                responsavel: {
+                    id:  mongoose.Types.ObjectId(idResponsavel),
+                    nome: nomeResponsavel,
+                    posGrad: posGradResponsavel
+                },
+                classDefeito,
+                opcoesHardware: {
+                    equipamento,
+                    equipPosicao,
+                    partNumber,
+                    serialNumber,
+                },
+                opcoesSoftware: {
+                    versaoBaseDados, 
+                    versaoSoftware,
+                    logsAnexado
+                },
                 tituloOcorrencia,
                 descricaoOcorrencia,
-                procedTecnicos,
-                logsAnexado,
-                posGradRelator,
-                posGradResponsavel
             })
 
             res.status(201).json({response, msg: "Registro de Ocorrência criado com sucesso!"})

@@ -22,6 +22,30 @@ const roController = {
         }
     },
 
+    getByRelator : async(req, res) => {
+        try {
+            const { id } = req.params
+            const ros = await RO.find({"relator.id": id})
+
+            res.json(ros)
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({msg: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"})
+        }
+    },
+
+    getByResponsavel : async(req, res) => {
+        try {
+            const { id } = req.params
+            const ros = await RO.find({"responsavel.id": id})
+
+            res.json(ros)
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({msg: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"})
+        }
+    },
+
     create: async (req, res) => {
         try {
             const { 

@@ -1,12 +1,16 @@
 const mongoose = require("mongoose")
-const {empresaSchema} = require('./Empresa')
-const {usuarioSchema} = require('./Usuario')
+const roSuporteSchema = require("./RoSuporte")
+const { empresaSchema } = require("./Empresa")
 const { anexoSchema } = require("./Anexo")
 
 const { Schema } = mongoose
 
 const roSchema = new Schema({
-    
+
+        _id: {
+            type: Number,
+            required: true
+        },
         contrato: {
             type: String,
             required: true
@@ -15,89 +19,98 @@ const roSchema = new Schema({
             type: String,
             required: true
         },
-        fase: {
-            type: String,
-            // enum: ['pendente', 'em andamento', 'concluido'],
-            required: true,
-            // default: 'pendente'
-        }, 
         dataRegistro: {
-            type: String,
-            required: true
-        },
-        horaRegistro: {
-            type: String,
+            type: Date,
             required: true,
+            default: new Date().toLocaleString("en-US", {timezone: 'America/Sao_Paulo'})
         },
-        numroOcorrencia: {
-            type: Number,
-            required: true,
-        },
-        nomeRelator: {
-            type: String,
-            required: true,
-        },
-        nomeResponsavel: {
-            type: String,
-            required: true,
-        },
-        colaboradorIACIT: {
-            type: String,
-            required: true,
-        },
-        class_defeito: {
+        classDefeito: {
             type: String,
             enum: ['hardware', 'software'],
             required: true,
-            // default: 'hardware'
         },
-        //Opções softaware
-        versaoBaseDados: {
-            type: String,
+        opcoesSoftware: {
+            type: {
+                versaoBaseDados: {
+                    type: String,
+                },
+                versaoSoftware: {
+                    type: String,
+                },
+                logsAnexado: {
+                    type: [anexoSchema]
+                },
+            },
+            _id: false
         },
-        versaoSoftware: {
-            type: String,
-        },
-        logsAnexado: {
-            type: [anexoSchema]
-        },
-        //Opções Hardware
-        equipamento: {
-            type: String,
-        },
-        equipPosicao : {
-            type: String,
-        },
-        partNumber : {
-            type: String,
-        },
-        serialNumber : {
-            type: String,
-        },
-        //-----
+        opcoesHardware: {
+            type: {
+                equipamento: {
+                    type: String,
+                },
+                equipPosicao : {
+                    type: String,
+                },
+                partNumber : {
+                    type: String,
+                },
+                serialNumber : {
+                    type: String,
+                },
+            },
+            _id: false
+        },    
         tituloOcorrencia : {
             type: String,
-            required: true,
-            
+            required: true,            
         },
         descricaoOcorrencia : {
             type: String,
-            // required: true,
         },
-        procedTecnicos : {
-            type: String,
-            // required: true,
-        },
-        posGradRelator: {
-            type: String,
-            required: true
+        relator: {
+            type: {
+                id: { 
+                    type: Schema.Types.ObjectId, 
+                    ref: 'Usuario',
+                    required: true
+                },
+                nome: {
+                    type: String, 
+                    ref: 'Usuario',
+                    required: true
+                },
+                posGrad: {
+                    type: String, 
+                    required: true
+                }
+            },
+            require: true,
+            _id: false
         }, 
-        posGradResponsavel: {
-            type: String,
-            required: true
+        responsavel: {
+            type: {
+                id: { 
+                    type: Schema.Types.ObjectId, 
+                    ref: 'Usuario',
+                    required: true
+                },
+                nome: {
+                    type: String, 
+                    ref: 'Usuario',
+                    required: true
+                },
+                posGrad: {
+                    type: String, 
+                    required: true
+                }
+            },
+            _id: false
+        },
+        suporte: {
+            type: roSuporteSchema,
+            _id: false
         }
-
-    },  { timestamps: true }
+    },
 )
 
 const RO = mongoose.model("RO", roSchema)

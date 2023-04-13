@@ -11,9 +11,10 @@ const anexoSchema = new Schema({
         type: String,
     },
     criadoEm: {
-        default: Date.now(),
+        default: new Date().toLocaleString("en-US", {timezone: 'America/Sao_Paulo'}),
         type: Date,
     },
+    _id: false
 });
 
 module.exports = { anexoSchema };

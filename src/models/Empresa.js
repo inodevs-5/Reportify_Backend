@@ -16,12 +16,10 @@ const empresaSchema = new Schema({
             type: String,
             required: true,
         },
+        _id: false
     }
 )
 
-const Empresa = mongoose.model("Empresa", empresaSchema)
-
 module.exports = {
-    Empresa,
     empresaSchema
 }

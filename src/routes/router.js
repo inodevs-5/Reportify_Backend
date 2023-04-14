@@ -5,7 +5,7 @@ const rosRouter = require("./ros")
 router.use("/ro", checkToken, rosRouter)
 
 const usuariosRouter = require("./usuarios")
-router.use("/usuario", usuariosRouter)
+router.use("/usuario", checkToken, usuariosRouter)
 
 const loginRouter = require("./login")
 router.use("/login", loginRouter)

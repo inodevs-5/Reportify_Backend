@@ -44,6 +44,17 @@ const usuarioController = {
             console.log(error)
             res.status(500).json({msg: "Aconteceu um erro no servidor, tente novamente mais tarde"})     
         }
+    },
+
+    getAll: async(req, res) => {
+        try {
+            const usuarios = await Usuario.find()
+
+            res.json(usuarios)
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({msg: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"})
+        }
     }
 }
 

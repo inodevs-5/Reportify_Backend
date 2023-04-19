@@ -37,7 +37,7 @@ const roController = {
     getByResponsavel : async(req, res) => {
         try {
             const { id } = req.params
-            const ros = await RO.find({"responsavel.id": id})
+            const ros = await RO.find({"responsavel.id": id, "suporte.fase": "pendente"})
 
             res.json(ros)
         } catch (error) {
@@ -175,6 +175,9 @@ const roController = {
                 },
                 tituloOcorrencia,
                 descricaoOcorrencia,
+                suporte: {
+                    fase: "pendente"
+                }
             })
 
             res.status(201).json({response, msg: "Registro de Ocorrência criado com sucesso!"})

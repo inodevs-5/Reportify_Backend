@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt")
 
 const usuarioController = {
     create: async(req, res) => {
-        const {nome, email, perfil, empresa, senha} = req.body
+        const {nome, email, perfil, senha} = req.body
     
         // validations
         if (!nome) {
@@ -32,7 +32,6 @@ const usuarioController = {
             nome, 
             email,
             perfil,
-            empresa, 
             senha: senhaHash,
         })
     

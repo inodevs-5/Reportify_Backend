@@ -1,5 +1,4 @@
 const mongoose = require("mongoose")
-const {empresaSchema} = require('./Empresa')
 
 const { Schema } = mongoose
 
@@ -19,9 +18,10 @@ const usuarioSchema = new Schema({
             required: true,
             default: 'cliente'
         },
-        empresa: {
-            type: empresaSchema
-        },
+        // empresa: {
+        //     type: String,
+        //     required: true
+        // },
         senha: {
             type: String,
             required: true

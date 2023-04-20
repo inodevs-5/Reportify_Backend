@@ -341,34 +341,12 @@ const roController = {
         updateSuporte: async (req, res) => {
             const id = req.params.id;
             const {
-                fase,  idcolaboradorIACIT, nome, classificacao, defeito, melhoria, outros, justificativaReclassificaca, categoria 
+                fase,  idcolaboradorIACIT, nome, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria 
             } = req.body
     
             const ro = {
-                suporte: {fase,  colaboradorIACIT:{id: mongoose.Types.ObjectId(idcolaboradorIACIT), nome}, classificacao, defeito, melhoria, outros, justificativaReclassificaca, categoria} 
+                suporte: {fase,  colaboradorIACIT:{id: mongoose.Types.ObjectId(idcolaboradorIACIT), nome}, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria} 
             };
-
-
-            if (!fase) {
-                return res.status(422).json({msg: 'A situação do Ro é obrigatória.'})
-            }
-            
-            if (!idcolaboradorIACIT) {
-                return res.status(422).json({msg: 'O id do colaborador atribuído é obrigatório.'})
-            }
-
-            if (!nome) {
-                return res.status(422).json({msg: 'O nome é obrigatório.'})
-            }
-
-            if (!classificacao) {
-                return res.status(422).json({msg: 'A classificação é obrigatório.'})
-            }
-
-            if (!categoria) {
-                return res.status(422).json({msg: 'A categoria é obrigatório.'})
-            }
-
     
             const updatedRo = await RO.findByIdAndUpdate(id, ro);
     

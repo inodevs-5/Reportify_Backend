@@ -4,6 +4,8 @@ const usuarioController = require("../controllers/usuarioController")
 
 router.route("/").post((req, res) => usuarioController.create(req, res))
 
-router.route("/").get((req, res) => usuarioController.getAll(req, res))
+router.route("/:id").put((req, res) => usuarioController.update(req, res))
 
-module.exports = router
+router.route("/:id").get((req, res) => usuarioController.show(req, res))
+
+module.exports = router

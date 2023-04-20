@@ -1,6 +1,6 @@
 const router = require("express").Router()
 const { upload } = require("../config/gridFsConfig")
-const { checkSuporte } = require("../middlewares/authMiddleware")
+const { checkAdmin } = require("../middlewares/authMiddleware")
 
 const roController = require("../controllers/roController")
 
@@ -8,7 +8,7 @@ router.route("/").get((req, res) => roController.getAll(req, res))
 
 router.route("/relator/:id").get((req, res) => roController.getByRelator(req, res))
 
-router.route("/responsavel/:id").get(checkSuporte, (req, res) => roController.getByResponsavel(req, res))
+router.route("/atribuido/:id").get(checkAdmin, (req, res) => roController.getByAtribuido(req, res))
 
 router.route("/").post(upload.array('anexo'), (req, res) => roController.create(req, res))
 

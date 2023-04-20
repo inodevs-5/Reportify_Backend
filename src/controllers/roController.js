@@ -13,7 +13,7 @@ const roController = {
     
     getAll: async(req, res) => {
         try {
-            const ros = await RO.find()
+            const ros = await RO.find().populate(['relator.id', 'suporte.colaboradorIACIT.id'])
 
             res.json(ros)
         } catch (error) {
@@ -34,10 +34,10 @@ const roController = {
         }
     },
 
-    getByResponsavel : async(req, res) => {
+    getByAtribuido : async(req, res) => {
         try {
             const { id } = req.params
-            const ros = await RO.find({"responsavel.id": id, "suporte.fase": "pendente"})
+            const ros = await RO.find({"suporte.colaboradorIACIT.id": id}).populate(['relator.id', 'suporte.colaboradorIACIT.id'])
 
             res.json(ros)
         } catch (error) {
@@ -51,7 +51,6 @@ const roController = {
             const { 
                 contrato,
                 orgao,
-                nomeRelator,
                 idRelator, 
                 nomeResponsavel, 
                 idResponsavel,
@@ -74,10 +73,6 @@ const roController = {
             
             if (!orgao) {
                 return res.status(422).json({msg: 'O orgão é obrigatório.'})
-            }
-
-            if (!nomeRelator) {
-                return res.status(422).json({msg: 'O nome do relator é obrigatório.'})
             }
 
             if (!nomeResponsavel) {
@@ -153,7 +148,6 @@ const roController = {
                 _id: id, 
                 relator: {
                     id: mongoose.Types.ObjectId(idRelator),
-                    nome: nomeRelator,
                     posGrad: posGradRelator
                 },
                 responsavel: {
@@ -175,9 +169,6 @@ const roController = {
                 },
                 tituloOcorrencia,
                 descricaoOcorrencia,
-                suporte: {
-                    fase: "pendente"
-                }
             })
 
             res.status(201).json({response, msg: "Registro de Ocorrência criado com sucesso!"})
@@ -192,10 +183,10 @@ const roController = {
             const { search } = req.params
 
             try {
-                const ros = await RO.find({$or: [{tituloOcorrencia: RegExp(search, 'i')}, {_id: search}]})  
+                const ros = await RO.find({$or: [{tituloOcorrencia: RegExp(search, 'i')}, {_id: search}]}).populate(['relator.id', 'suporte.colaboradorIACIT.id'])  
                 res.json(ros)   
             } catch {
-                const ros = await RO.find({tituloOcorrencia: RegExp(search, 'i')})  
+                const ros = await RO.find({tituloOcorrencia: RegExp(search, 'i')}).populate(['relator.id', 'suporte.colaboradorIACIT.id'])
                 res.json(ros) 
             }
 

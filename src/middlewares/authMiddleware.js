@@ -20,16 +20,6 @@ const checkToken = async(req, res, next) => {
     }
 }
 
-const checkSuporte = (req, res, next) => {
-    const { perfil } = res.locals
-
-    if (perfil !== "suporte" && perfil !== "admin") {
-        return res.status(401).json({msg: "Acesso negado!"})
-    }
-
-    next()
-}
-
 const checkAdmin = (req, res, next) => {
     const { perfil } = res.locals
 
@@ -40,4 +30,4 @@ const checkAdmin = (req, res, next) => {
     next()
 }
 
-module.exports = {checkToken, checkSuporte, checkAdmin}
+module.exports = {checkToken, checkAdmin}

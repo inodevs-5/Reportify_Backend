@@ -1,25 +1,27 @@
-const mongoose = require("mongoose")
+// const mongoose = require("mongoose")
 
-const { Schema } = mongoose
+// const { Schema } = mongoose
 
-const empresaSchema = new Schema({
-        nome: {
-            type: String,
-            required: true
-        },
-        cnpj: {
-            type: String,
-            required: true,
-            unique: true,
-        },
-        contato: {
-            type: String,
-            required: true,
-        },
-        _id: false
-    }
-)
+// const empresaSchema = new Schema({
+//         nome: {
+//             type: String,
+//             required: true
+//         },
+//         cnpj: {
+//             type: String,
+//             required: true,
+//             unique: true,
+//         },
+//         contato: {
+//             type: String,
+//             required: true,
+//         },
+//     }
+// )
 
-module.exports = {
-    empresaSchema
-}
+// const Empresa = mongoose.model("Empresa", empresaSchema)
+
+// module.exports = {
+//     Empresa,
+//     empresaSchema
+// }

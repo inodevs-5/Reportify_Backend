@@ -5,7 +5,7 @@ const { Schema } = mongoose
 const roSuporteSchema = new Schema ({
         fase: {
             type: String,
-            enum: ['pendente', 'em andamento', 'em validacao', 'concluido'],
+            enum: ['pendente', 'em andamento', 'aguardando validacao', 'concluido'],
             required: true,
             default: 'pendente'
         },

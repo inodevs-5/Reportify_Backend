@@ -344,7 +344,7 @@ const roController = {
     get: async (req, res) => {   
         const id = req.params.id;
         try {
-          const ro = await RO.findById(id);
+          const ro = await RO.findById(id).populate(['relator.id', 'suporte.colaboradorIACIT.id']);
           if (!ro){
             res.status(404).json({ msg:"Registro de ocorrência não encontrado." });
             return;

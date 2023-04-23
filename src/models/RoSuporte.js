@@ -16,6 +16,11 @@ const roSuporteSchema = new Schema ({
                     ref: 'Usuario' ,
                     required: true
                 },
+                nome: {
+                    type: Schema.Types.ObjectId, 
+                    ref: 'Usuario' ,
+                    required: true
+                },
                 _id: false
             },
         },

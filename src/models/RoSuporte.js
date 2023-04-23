@@ -17,7 +17,7 @@ const roSuporteSchema = new Schema ({
                     required: true
                 },
                 nome: {
-                    type: Schema.Types.ObjectId, 
+                    type: String, 
                     ref: 'Usuario' ,
                     required: true
                 },

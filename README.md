@@ -21,7 +21,7 @@ Este README contém as informações necessárias para a execução do back-end 
 - Crie um Shared Cluster, selecione Cloud Environment e em seguida clique em Connect e selecione Drivers e depois clique em Close.
 - Copie a string gerada e crie no repositório do projeto um arquivo .env, e dentro do arquivo cole o link. Deverá ficar dessa forma:
 ```
-DB_URL = link_do_mongodb
+DB_URL = link_mongodb
 SECRET = inodevs2k23
 ```
 **Obs.:** Colocar o username e o password no link do banco.

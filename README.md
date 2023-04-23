@@ -9,8 +9,8 @@ Este README contém as informações necessárias para a execução do back-end 
 #
 
 ## Pré-requisitos
-- Node >= 18.14.2
-- NPM >= 9.5.0
+- [Node](https://nodejs.org/en/download) >= 18.14.2
+- [NPM](https://www.npmjs.com/package/download) >= 9.5.0
 - [MongoDB Atlas Database](https://www.mongodb.com/atlas/database)
 
 #

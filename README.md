@@ -26,7 +26,7 @@ SECRET = inodevs2k23
 ```
 **Obs.:** Colocar o username e o password no link do banco.
 
-- No terminal do repositório:
+- No terminal do repositório da branch **Main**:
 ```
 > npm install
 > npm run dev

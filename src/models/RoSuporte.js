@@ -52,10 +52,6 @@ const roSuporteSchema = new Schema ({
         justificativaReclassificacao: {
             type: String,
         },
-        validacaoFechamentoRo: {
-            type: String,
-            enum: ['Encerrado', 'Aberto'],
-        },
          categoria: {
             type: String,
         },

@@ -359,7 +359,7 @@ const roController = {
         updateSuporte: async (req, res) => {
             const id = req.params.id;
             const {
-                fase,  idcolaboradorIACIT, nome, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria 
+                fase,  idcolaboradorIACIT, nome, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria
             } = req.body
     
             const ro = {
@@ -385,7 +385,7 @@ const roController = {
             } = req.body
     
             const ro = { 
-                suporte: {validacaoFechamentoRo}
+                validacaoFechamentoRo
                 
 
             }

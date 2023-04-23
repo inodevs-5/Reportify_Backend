@@ -1,5 +1,4 @@
 const mongoose = require("mongoose")
-const {empresaSchema} = require('./Empresa')
 
 const { Schema } = mongoose
 
@@ -15,12 +14,17 @@ const usuarioSchema = new Schema({
         },
         perfil: {
             type: String,
-            enum: ['admin', 'suporte', 'cliente'],
+            enum: ['admin', 'cliente'],
             required: true,
             default: 'cliente'
         },
         empresa: {
-            type: empresaSchema
+            type: String,
+            required: true
+        },
+        contato_empresa: {
+            type: String,
+            required: true
         },
         senha: {
             type: String,

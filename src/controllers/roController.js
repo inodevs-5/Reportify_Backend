@@ -13,7 +13,31 @@ const roController = {
     
     getAll: async(req, res) => {
         try {
-            const ros = await RO.find()
+            const ros = await RO.find().populate(['relator.id', 'suporte.colaboradorIACIT.id'])
+
+            res.json(ros)
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({msg: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"})
+        }
+    },
+
+    getByRelator : async(req, res) => {
+        try {
+            const { id } = req.params
+            const ros = await RO.find({"relator.id": id})
+
+            res.json(ros)
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({msg: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"})
+        }
+    },
+
+    getByAtribuido : async(req, res) => {
+        try {
+            const { id } = req.params
+            const ros = await RO.find({"suporte.colaboradorIACIT.id": id}).populate(['relator.id', 'suporte.colaboradorIACIT.id'])
 
             res.json(ros)
         } catch (error) {
@@ -26,12 +50,11 @@ const roController = {
         try {
             const { 
                 contrato,
-                orgao, 
-                fase, 
-                nomeRelator, 
+                orgao,
+                idRelator, 
                 nomeResponsavel, 
-                colaboradorIACIT, 
-                class_defeito, 
+                idResponsavel,
+                classDefeito, 
                 versaoBaseDados, 
                 versaoSoftware, 
                 equipamento,
@@ -40,7 +63,6 @@ const roController = {
                 serialNumber,
                 tituloOcorrencia,
                 descricaoOcorrencia,
-                procedTecnicos,
                 posGradRelator,
                 posGradResponsavel
             } = req.body
@@ -52,37 +74,14 @@ const roController = {
             if (!orgao) {
                 return res.status(422).json({msg: 'O orgão é obrigatório.'})
             }
-            
-            // if (!dataRegistro) {
-            //     return res.status(422).json({msg: 'A data de registro é obrigatório para o campo.'})
-            // }
-
-            // if (!horaRegistro) {
-            //     return res.status(422).json({msg: 'A hora do registro é obrigatório para o campo.'})
-            // }
-            // if (!numroOcorrencia) {
-            //     return res.status(422).json({msg: 'O número da ocorrência é obrigatório para o campo.'})
-            // }
-
-            if (!nomeRelator) {
-                return res.status(422).json({msg: 'O nome do relator é obrigatório.'})
-            }
 
             if (!nomeResponsavel) {
                 return res.status(422).json({msg: 'O nome do responsavel é obrigatório.'})
             }
 
-            // if (!colaboradorIACIT) {
-            //     return res.status(422).json({msg: 'O nome do colaborador IACIT é obrigatório.'})
-            // }
-
             if (!tituloOcorrencia) {
                 return res.status(422).json({msg: 'O titulo da ocorrência é obrigatório.'})
             }
-
-            // if (!descricaoOcorrencia) {
-            //     return res.status(422).json({msg: 'A descrição da ocorrência é obrigatório.'})
-            // }
 
             if (!posGradRelator) {
                 return res.status(422).json({msg: 'O POS./DRAD do relator é obrigatório.'})
@@ -92,16 +91,12 @@ const roController = {
                 return res.status(422).json({msg: 'O POS./DRAD do responsável é obrigatório.'})
             }
 
-            // if (!procedTecnicos) {
-            //     return res.status(422).json({msg: 'Os procedimentos tecnicos são obrigatórios.'})
-            // }
-
-            if (!class_defeito) {
+            if (!classDefeito) {
                 return res.status(422).json({msg: 'A classe do defeito é obrigatório.'})
             }
 
             
-            if (class_defeito == 'hardware') {
+            if (classDefeito == 'hardware') {
                 if (!equipamento) {
                     return res.status(422).json({msg: 'O equipamento equipamento é obrigatório.'})
                 }
@@ -119,7 +114,7 @@ const roController = {
                 }
             }
 
-            if (class_defeito == 'software') {
+            if (classDefeito == 'software') {
                 if (!versaoBaseDados) {
                     return res.status(422).json({msg: 'A versão da base de dados é obrigatória.'})
                 }
@@ -140,41 +135,40 @@ const roController = {
                 });
             }
 
-            const date = new Date()
+            const roAnterior = await RO.findOne().sort({_id: -1});
 
-            const dataRegistro = date.getDate() + '/' + (date.getMonth() + 1) + '/'+ date.getFullYear()
-            const horaRegistro = (date.getHours()<10?'0':'') + date.getHours() + ':' + (date.getMinutes()<10?'0':'') + date.getMinutes() + ':' + date.getSeconds()
-
-            const roAnterior = await RO.findOne().sort({numroOcorrencia: -1});
-
-            let numroOcorrencia = 1
-            if (roAnterior && roAnterior.numroOcorrencia) {
-                numroOcorrencia = roAnterior.numroOcorrencia + 1;
+            let id = 1
+            if (roAnterior && roAnterior._id) {
+                id = roAnterior._id + 1;
             }
 
             const response = await RO.create({ 
                 contrato,
                 orgao, 
-                fase, 
-                dataRegistro, 
-                horaRegistro, 
-                numroOcorrencia, 
-                nomeRelator, 
-                nomeResponsavel, 
-                colaboradorIACIT, 
-                class_defeito, 
-                versaoBaseDados, 
-                versaoSoftware, 
-                equipamento,
-                equipPosicao,
-                partNumber,
-                serialNumber,
+                _id: id, 
+                relator: {
+                    id: mongoose.Types.ObjectId(idRelator),
+                    posGrad: posGradRelator
+                },
+                responsavel: {
+                    id:  mongoose.Types.ObjectId(idResponsavel),
+                    nome: nomeResponsavel,
+                    posGrad: posGradResponsavel
+                },
+                classDefeito,
+                opcoesHardware: {
+                    equipamento,
+                    equipPosicao,
+                    partNumber,
+                    serialNumber,
+                },
+                opcoesSoftware: {
+                    versaoBaseDados, 
+                    versaoSoftware,
+                    logsAnexado
+                },
                 tituloOcorrencia,
                 descricaoOcorrencia,
-                procedTecnicos,
-                logsAnexado,
-                posGradRelator,
-                posGradResponsavel
             })
 
             res.status(201).json({response, msg: "Registro de Ocorrência criado com sucesso!"})
@@ -188,9 +182,14 @@ const roController = {
         try {
             const { search } = req.params
 
-            const ros = await RO.find({tituloOcorrencia: RegExp(search, 'i')})
+            try {
+                const ros = await RO.find({$or: [{tituloOcorrencia: RegExp(search, 'i')}, {_id: search}]}).populate(['relator.id', 'suporte.colaboradorIACIT.id'])  
+                res.json(ros)   
+            } catch {
+                const ros = await RO.find({tituloOcorrencia: RegExp(search, 'i')}).populate(['relator.id', 'suporte.colaboradorIACIT.id'])
+                res.json(ros) 
+            }
 
-            res.json(ros)
         } catch (error) {
             console.log(error)
             res.status(500).json({msg: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"})
@@ -213,6 +212,202 @@ const roController = {
             res.status(500).json({msg: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"})
         }
     },
+
+    updateCliente: async (req, res) => {
+        const id = req.params.id;
+        const {
+                contrato,
+                orgao,
+                nomeRelator,
+                idRelator, 
+                nomeResponsavel, 
+                idResponsavel,
+                classDefeito, 
+                versaoBaseDados, 
+                versaoSoftware, 
+                equipamento,
+                equipPosicao,
+                partNumber,
+                serialNumber,
+                tituloOcorrencia,
+                descricaoOcorrencia,
+                posGradRelator,
+                posGradResponsavel
+        } = req.body
+
+        const ro = { 
+            contrato,
+            orgao, 
+            _id: id, 
+            relator: {
+                id: mongoose.Types.ObjectId(idRelator),
+                nome: nomeRelator,
+                posGrad: posGradRelator
+            },
+            responsavel: {
+                id:  mongoose.Types.ObjectId(idResponsavel),
+                nome: nomeResponsavel,
+                posGrad: posGradResponsavel
+            },
+            classDefeito,
+            opcoesHardware: {
+                equipamento,
+                equipPosicao,
+                partNumber,
+                serialNumber,
+            },
+            opcoesSoftware: {
+                versaoBaseDados, 
+                versaoSoftware,
+                //logsAnexado
+            },
+            tituloOcorrencia,
+            descricaoOcorrencia,
+        }
+
+        if (!contrato) {
+            return res.status(422).json({msg: 'O número do contrato é obrigatório.'})
+        }
+        
+        if (!orgao) {
+            return res.status(422).json({msg: 'O orgão é obrigatório.'})
+        }
+
+        if (!nomeRelator) {
+            return res.status(422).json({msg: 'O nome do relator é obrigatório.'})
+        }
+
+        if (!nomeResponsavel) {
+            return res.status(422).json({msg: 'O nome do responsavel é obrigatório.'})
+        }
+
+        if (!tituloOcorrencia) {
+            return res.status(422).json({msg: 'O titulo da ocorrência é obrigatório.'})
+        }
+
+        if (!posGradRelator) {
+            return res.status(422).json({msg: 'O POS./DRAD do relator é obrigatório.'})
+        }
+
+        if (!posGradResponsavel) {
+            return res.status(422).json({msg: 'O POS./DRAD do responsável é obrigatório.'})
+        }
+
+        if (!classDefeito) {
+            return res.status(422).json({msg: 'A classe do defeito é obrigatório.'})
+        }
+
+        
+        if (classDefeito == 'hardware') {
+            if (!equipamento) {
+                return res.status(422).json({msg: 'O equipamento equipamento é obrigatório.'})
+            }
+
+            if (!equipPosicao) {
+                return res.status(422).json({msg: 'A posição do equipamento da ocorrência é obrigatório.'})
+            }
+
+            if (!partNumber) {
+                return res.status(422).json({msg: 'O Part Number é obrigatório.'})
+            }
+
+            if (!serialNumber) {
+                return res.status(422).json({msg: 'O Serial Number é obrigatório.'})
+            }
+        }
+
+        if (classDefeito == 'software') {
+            if (!versaoBaseDados) {
+                return res.status(422).json({msg: 'A versão da base de dados é obrigatória.'})
+            }
+
+            if (!versaoSoftware) {
+                return res.status(422).json({msg: 'A versão do software é obrigatória.'})
+            }
+        }
+
+
+
+
+        const updatedRo = await RO.findByIdAndUpdate(id, ro);
+
+        if(!updatedRo) {
+            res.status(404).json({ msg:"Registro de ocorrência não encontrado." });
+            return;
+        }
+
+        res
+        .status(200) 
+        .json({ ro, msg: "Registro de ocorrência atualizado com sucesso" });
+    },
+
+    get: async (req, res) => {   
+        const id = req.params.id;
+        try {
+          const ro = await RO.findById(id).populate(['relator.id', 'suporte.colaboradorIACIT.id']);
+          if (!ro){
+            res.status(404).json({ msg:"Registro de ocorrência não encontrado." });
+            return;
+          }
+  
+            res.json(ro);
+          } catch (error) {
+            console.log(error);
+          }
+        },
+
+        updateSuporte: async (req, res) => {
+            const id = req.params.id;
+            const {
+                fase,  idcolaboradorIACIT, nome, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria 
+            } = req.body
+    
+            const ro = {
+                suporte: {fase,  colaboradorIACIT:{id: mongoose.Types.ObjectId(idcolaboradorIACIT), nome}, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria} 
+            };
+    
+            const updatedRo = await RO.findByIdAndUpdate(id, ro);
+    
+            if(!updatedRo) {
+                res.status(404).json({ msg:"Registro de ocorrência não encontrado." });
+                return;
+            }
+    
+            res
+            .status(200) 
+            .json({ ro, msg: "Registro de ocorrência atualizado com sucesso" });
+        },
+
+        close: async (req, res) => {
+            const id = req.params.id;
+            const {
+                    validacaoFechamentoRo
+            } = req.body
+    
+            const ro = { 
+                suporte: {validacaoFechamentoRo}
+                
+
+            }
+
+            if (!validacaoFechamentoRo) {
+                return res.status(422).json({msg: 'O status do fechamento é obrigatória.'})
+            }
+    
+    
+    
+            const updatedRo = await RO.findByIdAndUpdate(id, ro);
+    
+            if(!updatedRo) {
+                res.status(404).json({ msg:"Registro de ocorrência não encontrado." });
+                return;
+            }
+    
+            res
+            .status(200) 
+            .json({ ro, msg: "Registro de ocorrência atualizado com sucesso" });
+        },
+
 }
 
 module.exports = roController

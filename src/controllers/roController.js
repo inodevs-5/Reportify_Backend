@@ -53,6 +53,7 @@ const roController = {
                 orgao,
                 idRelator, 
                 nomeResponsavel, 
+                nomeRelator,
                 idResponsavel,
                 classDefeito, 
                 versaoBaseDados, 
@@ -148,6 +149,7 @@ const roController = {
                 _id: id, 
                 relator: {
                     id: mongoose.Types.ObjectId(idRelator),
+                    nome: nomeRelator,
                     posGrad: posGradRelator
                 },
                 responsavel: {
@@ -361,9 +363,9 @@ const roController = {
             const {
                 fase,  idcolaboradorIACIT, nome, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria
             } = req.body
-    
+            
             const ro = {
-                suporte: {fase,  colaboradorIACIT:{id: mongoose.Types.ObjectId(idcolaboradorIACIT), nome}, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria} 
+                suporte: {fase: fase.trim(),  colaboradorIACIT:{id: mongoose.Types.ObjectId(idcolaboradorIACIT), nome}, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria} 
             };
     
             const updatedRo = await RO.findByIdAndUpdate(id, ro);

@@ -28,7 +28,6 @@ const usuarioSchema = new Schema({
         },
         senha: {
             type: String,
-            required: true
         },
     }
 )

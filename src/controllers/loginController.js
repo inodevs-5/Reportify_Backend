@@ -18,7 +18,7 @@ const loginController = {
         //check if user exists
         const usuario = await Usuario.findOne({ email: email})
 
-        if (!usuario) {
+        if (!usuario || !usuario.senha) {
             return res.status(404).json({ msg: "Usuário não encontrado!"})
         }
         

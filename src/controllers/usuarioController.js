@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt")
 
 const usuarioController = {
     create: async(req, res) => {
-        const {nome, email, perfil, empresa, contato_empresa, senha} = req.body
+        const {nome, email, perfil, empresa, contato_empresa } = req.body
 
         // validations
         if (!nome) {
@@ -18,19 +18,13 @@ const usuarioController = {
         if (!contato_empresa) {
             return res.status(422).json({ msg: "Contato_empresa é Obrigatorio"})
         }
-        if(!senha){
-            return res.status(422).json({ msg: "Senha é Obrigatoria"})
-        }
+
         // check if user exist
         const usuarioExists = await Usuario.findOne({ email: email})
 
         if (usuarioExists) {
             return res.status(422).json({ msg: 'Por Favor, utilize outro e-mail'})
         }
-
-        // create passwor
-        const salt = await bcrypt.genSalt(12)
-        const senhaHash = await bcrypt.hash(senha, salt)
 
         // create user
         const usuario = new Usuario({
@@ -39,7 +33,6 @@ const usuarioController = {
             perfil,
             empresa,
             contato_empresa,
-            senha: senhaHash,
         })
 
         try {
@@ -54,7 +47,7 @@ const usuarioController = {
 
     update: async (req, res) => {
         const { id } = req.params;
-        const { nome, email, perfil, empresa, contato_empresa, senha } = req.body;
+        const { nome, email, perfil, empresa, contato_empresa } = req.body;
 
         try {
             // find user by id
@@ -70,12 +63,6 @@ const usuarioController = {
             usuario.perfil = perfil || usuario.perfil;
             usuario.empresa = empresa || usuario.empresa;
             usuario.contato_empresa = contato_empresa || usuario.contato_empresa;
-
-            if (senha) {
-                const salt = await bcrypt.genSalt(12);
-                const senhaHash = await bcrypt.hash(senha, salt);
-                usuario.senha = senhaHash;
-            }
 
             // save updated user
             await usuario.save();

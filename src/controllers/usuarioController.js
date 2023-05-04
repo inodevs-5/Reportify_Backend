@@ -1,5 +1,6 @@
 const { Usuario } = require("../models/Usuario")
 const bcrypt = require("bcrypt")
+const nodemailer = require("nodemailer")
 
 const usuarioController = {
     create: async(req, res) => {
@@ -37,6 +38,39 @@ const usuarioController = {
 
         try {
             await usuario.save()
+
+            let transporter = nodemailer.createTransport({
+                host: process.env.HOST_EMAIL,
+                port: process.env.PORT_EMAIL,
+                secure: false,
+                auth: {
+                    user: process.env.USER_EMAIL,
+                    pass: process.env.PASS_EMAIL
+                }
+            })
+            
+            transporter.sendMail({
+                from: `Inodevs <${process.env.USER_EMAIL}>`,
+                to: usuario.email,
+                subject: "Defina sua senha no Reportify.",
+                html: `
+                    <h1>Seja bem-vindo ao Reportify!</h1>
+                    <p>Você acabou de ser cadastrado no aplicativo Reportify por um administrador do sistema. Após instalar o aplicativo no seu celular, clique <a href="http://reportify-app-inodevs-2023/senha/${usuario._id}">aqui</a> para definir a sua senha e conseguir se autenticar no aplicativo.</p>
+                    <p>Além disso, confira abaixo as suas informações que foram salvas no nosso banco de dados:</p>
+                    <ul>
+                        <li><strong>Nome: </strong>${usuario.nome}</li>
+                        <li><strong>E-mail: </strong>${usuario.email}</li>
+                        <li><strong>Empresa: </strong>${usuario.empresa}</li>
+                        <li><strong>Contato da Empresa: </strong>${usuario.contato_empresa}</li>
+                    </ul>
+                    <p>Estes são seus dados no sistema. Em relação a sua senha que ainda será definida por você, ela será completamente criptografada antes de ser armazenada. Caso queira alterar qualquer informação que está no nosso banco de dados, você pode enviar um e-mail de solicitação para esse mesmo endereço.</p>
+                `
+            }).then(message => {
+                console.log(message)
+            }).catch(error => {
+                console.log(error)
+                return res.status(422).json({msg: 'Erro ao enviar o email'})
+            })
 
             res.status(201).json({msg: 'Usuário criado com sucesso'})
         } catch (error) {

@@ -112,7 +112,50 @@ const usuarioController = {
             console.log(error)
             res.status(500).json({msg: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"})
         }
-    }
+    },
+
+    updatePassword: async(req, res) => {
+        const { id } = req.params;
+        const { senha, confirmarSenha } = req.body;
+
+        try {
+            const usuario = await Usuario.findById(id);
+
+            if (!usuario) {
+                return res.status(404).json({ msg: 'Usuário não encontrado' });
+            }
+
+            if (senha !== confirmarSenha) {
+                return res.status(422).json({ msg: 'As senhas não conferem!' });
+            }
+            if (senha.length < 8) {
+                return res.status(422).json({ msg: 'A senha deve conter pelo menos 8 caracteres!' });
+            }
+            if (!senha.match(/[a-z]+/)) {
+                return res.status(422).json({ msg: 'A senha precisa possuir pelo menos uma letra minúscula!' });
+            }
+            if (!senha.match(/[A-Z]+/)) {
+                return res.status(422).json({ msg: 'A senha precisa possuir pelo menos uma letra maiúscula!' });
+            }
+            if (!senha.match(/[0-9]+/)) {
+                return res.status(422).json({ msg: 'A senha precisa possuir pelo menos um número!' });
+            }
+            if (!senha.match(/[@#$%&*><+\-_=.,;/()[\]{}?'"|\\]/)) {
+                return res.status(422).json({ msg: 'A senha precisa possuir pelo menos um caracter especial!' });
+            }
+
+            const salt = await bcrypt.genSalt(12);
+            const senhaHash = await bcrypt.hash(senha, salt);
+            usuario.senha = senhaHash;
+
+            await usuario.save();
+            res.status(200).json({ msg: 'A senha do usuário foi atualizado com sucesso!' });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ msg: "Aconteceu um erro no servidor, tente novamente mais tarde" });
+        }
+    },
+
 }
 
 module.exports = usuarioController

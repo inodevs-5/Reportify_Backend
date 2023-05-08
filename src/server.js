@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config();
 const express = require("express")
 const cors = require("cors")
 
@@ -8,8 +8,9 @@ app.use(cors())
 
 app.use(express.json())
 
-const conn = require("./config/connDB")
-conn()
+// conect to databases
+const { connectToMainDb } = require("./config/connectToMainDb")
+connectToMainDb();
 
 const routes = require("./routes/router")
 app.use("/", routes)

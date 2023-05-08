@@ -1,8 +1,12 @@
+require('dotenv').config();
 const multer = require('multer')
-const { GridFsStorage } = require('multer-gridfs-storage')
 const path = require('path')
 const mongoose = require('mongoose')
-const url = process.env.DB_URL
+const { GridFsStorage } = require('multer-gridfs-storage')
+
+const url = process.env.BD_URL_MAIN;
+console.log("URL de conexão com o banco de dados:", url);
+
 
 const storage = new GridFsStorage({
     url: url,

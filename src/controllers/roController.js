@@ -1,8 +1,9 @@
+require('dotenv').config();
 const RO = require("../models/RO")
 const mongoose = require('mongoose')
 
 let gfs
-const connect = mongoose.createConnection(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true });
+const connect = mongoose.createConnection(process.env.BD_URL_MAIN, { useNewUrlParser: true, useUnifiedTopology: true });
 connect.once('open', () => {
     gfs = new mongoose.mongo.GridFSBucket(connect.db, {
         bucketName: "anexos"

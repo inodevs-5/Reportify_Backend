@@ -30,6 +30,23 @@ const usuarioSchema = new Schema({
             type: String,
             required: true
         },
+        notificacao: {
+            type:{            
+                destinatario: {
+                    type: String,
+                    required: false,
+                },
+                tipo: {
+                    type: String,
+                    enum: ['criacaoRO', 'roAtendido', 'roFechado'],
+                    required: false,
+                }, 
+                conteudo: {
+                    type: String,
+                    required: false,
+                }
+            }
+        }
     }
 )
 

@@ -1,5 +1,6 @@
 const RO = require("../models/RO")
 const mongoose = require('mongoose')
+const notificacao = require("./notificacaoController")
 
 let gfs
 const connect = mongoose.createConnection(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -170,6 +171,8 @@ const roController = {
                 tituloOcorrencia,
                 descricaoOcorrencia,
             })
+
+            notificacao.criado(idRelator)
 
             res.status(201).json({response, msg: "Registro de Ocorrência criado com sucesso!"})
         } catch (error) {
@@ -372,6 +375,8 @@ const roController = {
                 res.status(404).json({ msg:"Registro de ocorrência não encontrado." });
                 return;
             }
+
+            notificacao.atendido(idRelator, idResponsavel)
     
             res
             .status(200) 
@@ -402,7 +407,9 @@ const roController = {
                 res.status(404).json({ msg:"Registro de ocorrência não encontrado." });
                 return;
             }
-    
+            
+            notificacao.fechado(idRelator, idResponsavel)
+
             res
             .status(200) 
             .json({ ro, msg: "Registro de ocorrência atualizado com sucesso" });

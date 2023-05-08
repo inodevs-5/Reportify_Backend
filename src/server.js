@@ -9,8 +9,11 @@ app.use(cors())
 app.use(express.json())
 
 // conect to databases
-const { connectToMainDb } = require("./config/connectToMainDb")
+const mongoose = require("mongoose");
+const { connectToMainDb } = require("./config/connectToMainDb");
+const { connectToSecondDb } = require("./config/connectToSecondDb");
 connectToMainDb();
+connectToSecondDb();
 
 const routes = require("./routes/router")
 app.use("/", routes)

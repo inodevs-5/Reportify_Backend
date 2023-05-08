@@ -1,5 +1,5 @@
 const mongoose = require("mongoose")
-const {empresaSchema} = require('./Empresa')
+const {mensagemSchema} = require('./Mensagem')
 
 const { Schema } = mongoose
 
@@ -20,7 +20,10 @@ const usuarioSchema = new Schema({
             default: 'cliente'
         },
         empresa: {
-            type: empresaSchema
+            type: String,
+        },
+        contato_empresa: {
+            type: String,
         },
         senha: {
             type: String,

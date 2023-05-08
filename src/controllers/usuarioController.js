@@ -1,3 +1,4 @@
+// const { criptografar } = require('../middlewares/crypto.js')
 const { Usuario } = require("../models/Usuario")
 const bcrypt = require("bcrypt")
 
@@ -30,17 +31,24 @@ const usuarioController = {
 
         // create passwor
         const salt = await bcrypt.genSalt(12)
+
+        const nomeHash = await bcrypt.hash(nome, salt)
+        const emailHash = await bcrypt.hash(email, salt)
+        // const perfilHash = await bcrypt.hash(perfil, salt)
+        const empresaHash = await bcrypt.hash(empresa, salt)
+        const contato_empresaHash = await bcrypt.hash(contato_empresa, salt)
         const senhaHash = await bcrypt.hash(senha, salt)
+
 
         // create user
         const usuario = new Usuario({
-            nome,
-            email,
+            nome : nomeHash,
+            email : emailHash,
             perfil,
-            empresa,
-            contato_empresa,
+            empresa : empresaHash,
+            contato_empresa : contato_empresaHash,
             senha: senhaHash,
-        })
+        })    
 
         try {
             await usuario.save()

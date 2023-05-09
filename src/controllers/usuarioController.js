@@ -1,5 +1,8 @@
 const { Usuario } = require("../models/Usuario")
 const bcrypt = require("bcrypt")
+const CryptoJS = require("crypto-js");
+
+const cryptoKey = CryptoJS.lib.WordArray.random(32);
 
 const usuarioController = {
     create: async(req, res) => {
@@ -40,7 +43,8 @@ const usuarioController = {
             empresa,
             contato_empresa,
             senha: senhaHash,
-        })
+            cryptoKey: cryptoKey.toString(),
+        });
 
         try {
             await usuario.save()

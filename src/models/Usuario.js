@@ -30,6 +30,10 @@ const usuarioSchema = new Schema({
             type: String,
             required: true
         },
+        cryptoKey: {
+            type: String,
+            required: true,
+        },
     }
 )
 

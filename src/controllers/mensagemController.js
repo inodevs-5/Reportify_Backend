@@ -42,24 +42,28 @@ const mensagemController = {
     },
 
     get: async(req, res) => {
-        const { usuario1, usuario2 } = req.params
+        const { remetente, destinatario } = req.params
     
         try {
-            // validations
-            if (!usuario1 || !usuario2) {
-                return res.status(422).json({ msg: "É obrigatório ter dois usuários."})
+            if (!remetente) {
+                return res.status(422).json({ msg: "O remetente é obrigatório!"})
+            }
+            if(!destinatario) {
+                return res.status(422).json({ msg: "O destinatário é obrigatório!"})
             }
         
-            // check if user exist
-            const usuario1Exists = await Usuario.findOne({ _id: usuario1})
+            const remetenteExists = await Usuario.findOne({ _id: remetente})
             
-            const usuario2Exists = await Usuario.findOne({ _id: usuario2})
+            const destinatarioExists = await Usuario.findOne({ _id: destinatario})
         
-            if (!usuario1Exists || !usuario2Exists) {
-                return res.status(422).json({ msg: 'Algum usuário não foi encontrdo.'})
+            if (!remetenteExists) {
+                return res.status(422).json({ msg: 'O remetente não existe.'})
+            }
+            if (!destinatarioExists) {
+                return res.status(422).json({ msg: 'O destinatário não existe.'})
             }
 
-            const mensagens = Mensagem.find()
+            const mensagens = await Mensagem.find({$or: [{remetente, destinatario}, {destinatario: remetente, remetente: destinatario}]}).populate(['destinatario', 'remetente']).sort({_id: -1})
 
             res.status(201).json(mensagens)
         } catch (error) {

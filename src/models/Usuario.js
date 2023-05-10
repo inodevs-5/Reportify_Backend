@@ -1,5 +1,5 @@
 const mongoose = require("mongoose")
-const conn = require('../config/newConnections')
+const conn = require('../config/multipleDbsConnections')
 
 const { Schema } = mongoose
 

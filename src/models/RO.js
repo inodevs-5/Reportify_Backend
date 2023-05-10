@@ -109,7 +109,12 @@ const roSchema = new Schema({
         suporte: {
             type: roSuporteSchema,
             _id: false
-        }
+        },        
+        validacaoFechamentoRo: {
+            type: String,
+            enum: ['Encerrado', 'Aberto'],
+            default: 'Aberto'
+        },
     },
 )
 

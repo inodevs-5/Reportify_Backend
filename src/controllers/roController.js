@@ -1,6 +1,6 @@
 const RO = require("../models/RO")
 const mongoose = require('mongoose')
-const notificacao = require("./notificacaoController")
+// const notificacao = require("./notificacaoController")
 
 let gfs
 const connect = mongoose.createConnection(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -172,7 +172,7 @@ const roController = {
                 descricaoOcorrencia,
             })
             console.log("Cheguei")
-            notificacao.criado(idRelator)
+            // notificacao.criado(idRelator)
 
             res.status(201).json({response, msg: "Registro de Ocorrência criado com sucesso!"})
         } catch (error) {

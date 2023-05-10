@@ -3,11 +3,11 @@ const Schema = mongoose.Schema;
 
 const anexoSchema = new Schema({
     nomeAnexo: {
-        required: false,
+        required: true,
         type: String,
     },
     idAnexo: {
-        required: false,
+        required: true,
         type: String,
     },
     criadoEm: {

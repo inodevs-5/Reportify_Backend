@@ -1,6 +1,6 @@
 const RO = require("../models/RO")
 const mongoose = require('mongoose')
-// const notificacao = require("./notificacaoController")
+const notificacao = require("./notificacaoController")
 
 let gfs
 const connect = mongoose.createConnection(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -54,7 +54,6 @@ const roController = {
                 orgao,
                 idRelator, 
                 nomeResponsavel, 
-                nomeRelator,
                 idResponsavel,
                 classDefeito, 
                 versaoBaseDados, 
@@ -150,7 +149,6 @@ const roController = {
                 _id: id, 
                 relator: {
                     id: mongoose.Types.ObjectId(idRelator),
-                    nome: nomeRelator,
                     posGrad: posGradRelator
                 },
                 responsavel: {
@@ -173,8 +171,8 @@ const roController = {
                 tituloOcorrencia,
                 descricaoOcorrencia,
             })
-            console.log("Cheguei")
-            // notificacao.criado(idRelator)
+
+            notificacao.criado(idRelator)
 
             res.status(201).json({response, msg: "Registro de Ocorrência criado com sucesso!"})
         } catch (error) {
@@ -332,7 +330,7 @@ const roController = {
         }
 
 
-        notificacao.atendido(idRelator, idResponsavel)
+
 
         const updatedRo = await RO.findByIdAndUpdate(id, ro);
 
@@ -364,11 +362,11 @@ const roController = {
         updateSuporte: async (req, res) => {
             const id = req.params.id;
             const {
-                fase,  idcolaboradorIACIT, nome, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria
+                fase,  idcolaboradorIACIT, nome, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria 
             } = req.body
-            
+    
             const ro = {
-                suporte: {fase: fase.trim(),  colaboradorIACIT:{id: mongoose.Types.ObjectId(idcolaboradorIACIT), nome}, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria} 
+                suporte: {fase,  colaboradorIACIT:{id: mongoose.Types.ObjectId(idcolaboradorIACIT), nome}, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria} 
             };
     
             const updatedRo = await RO.findByIdAndUpdate(id, ro);
@@ -377,6 +375,8 @@ const roController = {
                 res.status(404).json({ msg:"Registro de ocorrência não encontrado." });
                 return;
             }
+
+            notificacao.atendido(idRelator, idResponsavel)
     
             res
             .status(200) 
@@ -390,7 +390,7 @@ const roController = {
             } = req.body
     
             const ro = { 
-                validacaoFechamentoRo
+                suporte: {validacaoFechamentoRo}
                 
 
             }

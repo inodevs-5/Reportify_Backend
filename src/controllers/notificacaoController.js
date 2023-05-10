@@ -35,8 +35,22 @@ const emailNotificacao = {
             const cadastroRO = {
                 from: process.env.EMAIL,
                 to: usuario.email,
-                subject: 'teste de envio de email',
-                text: 'Ro criado'
+                subject: 'Novo Registro de Ocorrência cadastrado',
+                text: `
+                    <h1>RO ${ro._id}</h1>
+                    <p>Olá senhor(a) ${usuario.nome}, esse email foi enviado para lhe informar que o Registro de Ocorrência ${ro._id}, foi cadastrado com sucesso.
+                        Agora basta esperar, que logo um de nossos colaboradores irá resolve-lo, e quando isso ocorrer você receberá uma notificação nesse mesmo e-mail</p>
+                        <p><strong>Status atual: </strong>Pendente </p>
+                        </br></br>
+                        <p>Informações cadastrados do Registro de Ocorrência:</p>
+                    <ul>
+                        <li><strong>Nome: </strong>${usuario.nome}</li>
+                        <li><strong>data do registro: </strong>${ro.dataRegistro}</li>
+                        <li><strong>Tipo: </strong>${ro.classDefeito}</li>
+                        <li><strong>Título do RO: </strong>${ro.tituloOcorrencia}</li>
+                        <li><strong>Descrição: </strong>${ro.descricaoOcorrencia}</li>
+                    </ul>
+                `
             }
 
             sendEmail(cadastroRO)
@@ -64,19 +78,12 @@ const emailNotificacao = {
             const RoAtendido = {
                 from: process.env.EMAIL,
                 to: usuario.email,
-                subject: 'teste de envio de email',
+                subject: 'Alteração do status do registro de ocorrência',
                 html: `
-                    <h1>O RO ${ro._id} </h1>
-                    <p>Você acabou de ser cadastrado no aplicativo Reportify por um administrador do sistema. Após instalar o aplicativo no seu celular, clique <a href="http://reportify-app-inodevs-2023/senha/${usuario._id}">aqui</a> para definir a sua senha e conseguir se autenticar no aplicativo.</p>
-                    <p>Além disso, confira abaixo as suas informações que foram salvas no nosso banco de dados:</p>
-                    <ul>
-                        <li><strong>Nome: </strong>${usuario.nome}</li>
-                        <li><strong>E-mail: </strong>${ro.dataRegistro}</li>
-                        <li><strong>Empresa: </strong>${ro.classDefeito}</li>
-                        <li><strong>Contato da Empresa: </strong>${ro.tituloOcorrencia}</li>
-                        <li><strong>Contato da Empresa: </strong>${ro.descricaoOcorrencia}</li>
-                    </ul>
-                    <p>Estes são seus dados no sistema. Em relação a sua senha que ainda será definida por você, ela será completamente criptografada antes de ser armazenada. Caso queira alterar qualquer informação que está no nosso banco de dados, você pode enviar um e-mail de solicitação para esse mesmo endereço.</p>
+                    <h1>RO ${ro._id}</h1>
+                    <p>Olá senhor(a) ${usuario.nome}, esse email foi enviado para lhe informar que o RO ${ro._id}, foi atendido.
+                        Entre no aplicativo para confirmar se o atendimente resolve seu problema</p>
+                        <p><strong>Status atual: </strong>Atendido</p>
                 `
             }
 
@@ -84,7 +91,11 @@ const emailNotificacao = {
                 from: process.env.EMAIL,
                 to: usuario_adm.email,
                 subject: 'teste de envio de email',
-                text: 'RO atendido enviado'
+                html:  `
+                    <h1>RO ${ro._id}</h1>
+                    <p>Olá senhor(a) ${usuario.nome}, esse email foi enviado para lhe informar que o RO ${ro._id} que você atendeu, já foi encaminhado para o relator.</p>
+                        <p><strong>Status atual: </strong>Atendido</p>
+                `
             }
 
             sendEmail(RoAtendido)
@@ -109,15 +120,24 @@ const emailNotificacao = {
             const RoFechado = {
                 from: process.env.EMAIL,
                 to: usuario.email,
-                subject: 'teste de envio de email',
-                text: 'Ro fechado'
+                subject: 'Registro de Ocorrência encerrado',
+                html: `
+                    <h1>RO ${ro._id}</h1>
+                    <p>Olá senhor(a) ${usuario.nome}, esse email foi enviado para lhe informar que o RO ${ro._id}, foi concluído.
+                        Qualquer erro entre em contato com algum colaborador via chat</p>
+                        <p><strong>Status atual: </strong>Concluído</p>
+                `
             }
 
             const RoFechadoAdm = {
                 from: process.env.EMAIL,
                 to: usuario_adm.email,
-                subject: 'teste de envio de email',
-                text: 'Ro fechado adm'
+                subject: 'Registro de Ocorrência encerrado',
+                html:  `
+                <h1>RO ${ro._id}</h1>
+                <p>Olá senhor(a) ${usuario.nome}, esse email foi enviado para lhe informar que o RO ${ro._id} que você atendeu, foi fechado, pois atendeu o problema do relator.</p>
+                    <p><strong>Status atual: </strong>Concluído</p>
+            `
             }
 
             sendEmail(RoFechado)

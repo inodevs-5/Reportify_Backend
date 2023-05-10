@@ -11,4 +11,6 @@ router.route("/:id").put((req, res) => usuarioController.update(req, res))
 
 router.route("/:id").get((req, res) => usuarioController.show(req, res))
 
+router.route("/:id").delete((req, res) => usuarioController.delete(req, res))
+
 module.exports = router

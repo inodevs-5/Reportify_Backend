@@ -171,7 +171,7 @@ const roController = {
                 tituloOcorrencia,
                 descricaoOcorrencia,
             })
-
+            console.log("Cheguei")
             notificacao.criado(idRelator)
 
             res.status(201).json({response, msg: "Registro de Ocorrência criado com sucesso!"})
@@ -330,7 +330,7 @@ const roController = {
         }
 
 
-
+        notificacao.atendido(idRelator, idResponsavel)
 
         const updatedRo = await RO.findByIdAndUpdate(id, ro);
 
@@ -375,8 +375,6 @@ const roController = {
                 res.status(404).json({ msg:"Registro de ocorrência não encontrado." });
                 return;
             }
-
-            notificacao.atendido(idRelator, idResponsavel)
     
             res
             .status(200) 

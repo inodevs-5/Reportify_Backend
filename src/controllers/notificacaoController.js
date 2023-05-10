@@ -26,6 +26,10 @@ const sendEmail = () => {
 const emailNotificacao = {
     criado: async (id) => {
         try {
+            const { _id, dataRegistro, classDefeito, nome, tituloOcorrencia, descricaoOcorrencia } = req.body
+
+            const ro = await RO.findById(_id);
+
             const usuario = await Usuario.findById(id);
 
             if (!usuario) {
@@ -52,7 +56,7 @@ const emailNotificacao = {
                     </ul>
                 `
             }
-
+            console.log("Enviando")
             sendEmail(cadastroRO)
         } catch (error) {
             console.log(error)
@@ -62,7 +66,6 @@ const emailNotificacao = {
 
     atendido: async (id, adm_id) => {
         try {
-            const { _id, dataRegistro, classDefeito, nome, tituloOcorrencia, descricaoOcorrencia } = req.body
 
             const ro = await RO.findById(_id);
 
@@ -109,6 +112,8 @@ const emailNotificacao = {
 
     fechado: async (id, adm_id) => {
         try {
+            const ro = await RO.findById(_id);
+
             const usuario = await Usuario.findById(id);
 
             const usuario_adm = await Usuario.findById(adm_id);
@@ -134,10 +139,10 @@ const emailNotificacao = {
                 to: usuario_adm.email,
                 subject: 'Registro de Ocorrência encerrado',
                 html:  `
-                <h1>RO ${ro._id}</h1>
-                <p>Olá senhor(a) ${usuario.nome}, esse email foi enviado para lhe informar que o RO ${ro._id} que você atendeu, foi fechado, pois atendeu o problema do relator.</p>
-                    <p><strong>Status atual: </strong>Concluído</p>
-            `
+                    <h1>RO ${ro._id}</h1>
+                    <p>Olá senhor(a) ${usuario.nome}, esse email foi enviado para lhe informar que o RO ${ro._id} que você atendeu, foi fechado, pois atendeu o problema do relator.</p>
+                        <p><strong>Status atual: </strong>Concluído</p>
+                `
             }
 
             sendEmail(RoFechado)

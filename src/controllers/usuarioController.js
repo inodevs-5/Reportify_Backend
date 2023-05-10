@@ -1,8 +1,7 @@
 const { Usuario } = require("../models/Usuario")
+const { Crypto } = require("../models/cryptoModel");
 const bcrypt = require("bcrypt")
 const CryptoJS = require("crypto-js");
-
-const cryptoKey = CryptoJS.lib.WordArray.random(32);
 
 const usuarioController = {
     create: async(req, res) => {
@@ -35,6 +34,9 @@ const usuarioController = {
         const salt = await bcrypt.genSalt(12)
         const senhaHash = await bcrypt.hash(senha, salt)
 
+        // generete cryptoKey
+        const cryptoKey = CryptoJS.lib.WordArray.random(32);
+
         // create user
         const usuario = new Usuario({
             nome,
@@ -43,13 +45,18 @@ const usuarioController = {
             empresa,
             contato_empresa,
             senha: senhaHash,
+        });
+
+        const crypto = new Crypto({
             cryptoKey: cryptoKey.toString(),
+            usuario: usuario._id
         });
 
         try {
             await usuario.save()
+            await crypto.save();
 
-            res.status(201).json({msg: 'Usuário criado com sucesso'})
+            res.status(201).json({msg: `Usuário criado com sucesso `}) // TODO retornar id
         } catch (error) {
             console.log(error)
             res.status(500).json({msg: "Aconteceu um erro no servidor, tente novamente mais tarde"})

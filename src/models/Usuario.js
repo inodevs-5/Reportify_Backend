@@ -1,4 +1,5 @@
 const mongoose = require("mongoose")
+const conn = require('../config/newConnections')
 
 const { Schema } = mongoose
 
@@ -30,14 +31,10 @@ const usuarioSchema = new Schema({
             type: String,
             required: true
         },
-        cryptoKey: {
-            type: String,
-            required: true,
-        },
     }
 )
 
-const Usuario = mongoose.model("Usuario", usuarioSchema)
+const Usuario = conn.main.model("Usuario", usuarioSchema)
 
 module.exports = {
     Usuario,

@@ -12,8 +12,6 @@ app.use(express.json())
 const conn = require("./config/connDB")
 conn()
 
-dbBackup()
-
 const routes = require("./routes/router")
 app.use("/", routes)
 
@@ -22,3 +20,5 @@ port = process.env.PORT || 3001
 app.listen(port, function() {
     console.log("Servidor rodando na porta", port)
 })
+
+dbBackup()

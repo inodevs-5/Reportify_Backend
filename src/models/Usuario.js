@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 const { roSchema } = require("./RO")
-
+const {mensagemSchema} = require('./Mensagem')
 const { Schema } = mongoose
 
 const usuarioSchema = new Schema({

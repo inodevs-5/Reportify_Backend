@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
+const { roSchema } = require("./RO")
 const {mensagemSchema} = require('./Mensagem')
-
 const { Schema } = mongoose
 
 const usuarioSchema = new Schema({
@@ -31,6 +31,28 @@ const usuarioSchema = new Schema({
             type: String,
             required: true
         },
+        notificacoes: [{
+            colaboradoIACIT:{
+                type: Schema.Types.ObjectId,
+                ref: 'RO',
+                required: false
+            },
+            idRo: {
+                type: Number,
+                ref: 'RO',
+                required: false
+            },
+            mensagem: {
+                type: String,
+                required: false
+            },
+            data:{
+                type: Date,
+                required: true,
+                default: new Date().toLocaleString("en-US", {timezone: 'America/Sao_Paulo'})
+            },
+            required: false
+        }]
     }
 )
 

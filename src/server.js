@@ -14,7 +14,7 @@ conn()
 const routes = require("./routes/router")
 app.use("/", routes)
 
-port = process.env.PORT || 3000
+port = process.env.PORT || 3001
 
 app.listen(port, function() {
     console.log("Servidor rodando na porta", port)

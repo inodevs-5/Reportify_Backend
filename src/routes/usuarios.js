@@ -13,4 +13,6 @@ router.route("/:id").get(checkToken, (req, res) => usuarioController.show(req, r
 
 router.route("/password/:id").patch((req, res) => usuarioController.updatePassword(req, res))
 
+router.route("/emailRedefinicao").post((req, res) => usuarioController.emailRedefinicao(req, res))
+
 module.exports = router

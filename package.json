@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./src/server.js",
-    "dev": "nodemon ./src/server.js"
+    "dev": "nodemon ./src/server.js npm run bkp",
+    "bkp": "nodemon ./src/middlewares/backup.js"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +20,7 @@
     "mongoose": "^6.10.3",
     "multer": "^1.4.4",
     "multer-gridfs-storage": "^5.0.2",
+    "node-cron": "^3.0.2",
     "nodemailer": "^6.9.1"
   },
   "devDependencies": {

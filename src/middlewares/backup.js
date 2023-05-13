@@ -36,4 +36,4 @@ const dbBackup = () => {
 // agendando a execução do backup
 cron.schedule('0 3 1 * *', dbBackup); // executa todo dia 1 de cada mês às 3h da manhã
 
-// module.exports = {dbBackup};
+module.exports = {dbBackup};

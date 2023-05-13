@@ -1,5 +1,5 @@
 require('dotenv').config()
-// const dbBackup = require("./middlewares/backup")
+const {dbBackup} = require("./middlewares/backup")
 const express = require("express")
 const cors = require("cors")
 
@@ -12,7 +12,7 @@ app.use(express.json())
 const conn = require("./config/connDB")
 conn()
 
-// dbBackup
+dbBackup()
 
 const routes = require("./routes/router")
 app.use("/", routes)

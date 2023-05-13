@@ -4,7 +4,6 @@ const bcrypt = require("bcrypt")
 const usuarioController = {
     create: async(req, res) => {
         const {nome, email, perfil, empresa, contato_empresa, senha} = req.body
-
         // validations
         if (!nome) {
             return res.status(422).json({ msg: "Nome é Obrigatorio"})

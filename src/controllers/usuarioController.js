@@ -135,29 +135,26 @@ const usuarioController = {
         return res.status(404).json({ msg: 'Usuário não encontrado' });
       }
 
-        // find the user's encryption key
-      const cryptoKey = await Crypto.findOne({ usuario: id });
-      if (!cryptoKey) {
+      // find the user's encryption key
+      const crypto = await Crypto.findOne({ usuario: id });
+      if (!crypto) {
         return res.status(404).json({ msg: 'key de criptografia não encontrada para o usuário.' });
       }
 
       const userData = {
         nome: usuario.nome,
         email: usuario.email,
-        // perfil: usuario.perfil,
         empresa: usuario.empresa,
         contato_empresa: usuario.contato_empresa,
         senha: usuario.senha,
       };
-      console.log("--------------", userData)
 
       // Criptografar cada dado do usuário separadamente
-      const encryptedName = encryptUserDataField(userData.nome, cryptoKey);
-      const encryptedEmail = encryptUserDataField(userData.email, cryptoKey);
-      // const encryptedRole = encryptUserDataField(userData.perfil, cryptoKey);
-      const encrypteCompany = encryptUserDataField(userData.empresa, cryptoKey);
-      const encrypteCompanyContact = encryptUserDataField(userData.contato_empresa, cryptoKey);
-      const encryptePassword = encryptUserDataField(userData.senha, cryptoKey);
+      const encryptedName = encryptUserDataField(userData.nome, crypto);
+      const encryptedEmail = encryptUserDataField(userData.email, crypto);
+      const encrypteCompany = encryptUserDataField(userData.empresa, crypto);
+      const encrypteCompanyContact = encryptUserDataField(userData.contato_empresa, crypto);
+      const encryptePassword = encryptUserDataField(userData.senha, crypto);
 
       // update user fields
       usuario.nome = encryptedName;
@@ -172,9 +169,9 @@ const usuarioController = {
       res.status(200).json({ msg: 'Os dados do usuário foram criptografados' });
 
       // Excluir a chave de criptografia após criptografar os dados
-      deleteCryptographicKey(chaveCriptografia.chave);
+      deleteCryptographicKey(crypto);
 
-      console.log('Dados criptografados:', encryptedData);
+      console.log('Dados criptografados');
     } catch (error) {
       console.log(error);
       res.status(500).json({ msg: "Aconteceu um erro no servidor, tente novamente mais tarde" });
@@ -183,23 +180,14 @@ const usuarioController = {
 }
 
   // Função para criptografar os dados do usuário
-  function encryptUserDataField(data, cryptoKey) {
-    console.log("--------------------------", data, cryptoKey.cryptoKey)
-    const encryptedData = CryptoJS.AES.encrypt(data, cryptoKey.cryptoKey).toString();
-
+  function encryptUserDataField(data, crypto) {
+    const encryptedData = CryptoJS.AES.encrypt(data, crypto.cryptoKey).toString();
     return encryptedData;
   }
 
   // Função para excluir a chave de criptografia
-  function deleteCryptographicKey(cryptoKey) {
-  // Excluir a chave de criptografia do MongoDB usando o Mongoose
-  cryptoKey.findOneAndDelete({ key: cryptoKey }, (err) => {
-      if (err) {
-        console.error('Erro ao excluir chave de criptografia:', err);
-      } else {
-        console.log('chave de criptografia excluída com sucesso.');
-      }
-    });
+  async function deleteCryptographicKey(crypto) {
+    await Crypto.findByIdAndDelete(crypto._id);
   }
 
 module.exports = usuarioController

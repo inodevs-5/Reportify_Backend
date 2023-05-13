@@ -3,8 +3,7 @@ const conn = require('../config/multipleDbsConnections')
 
 const cryptoSchema = new mongoose.Schema({
   cryptoKey: {
-    type: String,
-    required: true,
+    type: String
   },
   usuario: {
     type: mongoose.Schema.Types.ObjectId,

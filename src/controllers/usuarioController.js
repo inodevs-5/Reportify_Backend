@@ -190,7 +190,7 @@ const usuarioController = {
       console.log(error);
       res.status(500).json({ msg: "Aconteceu um erro no servidor, tente novamente mais tarde" });
     }
-  }
+  },
 
     updatePassword: async(req, res) => {
         const { id } = req.params;

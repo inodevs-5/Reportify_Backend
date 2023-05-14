@@ -1,6 +1,5 @@
 const mongoose = require("mongoose")
 const roSuporteSchema = require("./RoSuporte")
-const { empresaSchema } = require("./Empresa")
 const { anexoSchema } = require("./Anexo")
 const conn = require('../config/multipleDbsConnections')
 

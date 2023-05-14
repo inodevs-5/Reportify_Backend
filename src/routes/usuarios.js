@@ -17,4 +17,6 @@ router.route("/emailRedefinicao").post((req, res) => usuarioController.emailRede
 
 router.route("/:id").delete((req, res) => usuarioController.delete(req, res))
 
+router.route("/search/:nome").get(checkToken, checkAdmin, (req, res) => usuarioController.search(req, res))
+
 module.exports = router

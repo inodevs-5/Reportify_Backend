@@ -1,9 +1,5 @@
 const mongoose = require("mongoose")
-<<<<<<< HEAD
 const conn = require('../config/multipleDbsConnections')
-=======
-const {mensagemSchema} = require('./Mensagem')
->>>>>>> homolog
 
 const { Schema } = mongoose
 

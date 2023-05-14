@@ -2,6 +2,7 @@ const mongoose = require("mongoose")
 const roSuporteSchema = require("./RoSuporte")
 const { empresaSchema } = require("./Empresa")
 const { anexoSchema } = require("./Anexo")
+const conn = require('../config/multipleDbsConnections')
 
 const { Schema } = mongoose
 
@@ -117,6 +118,6 @@ const roSchema = new Schema({
     },
 )
 
-const RO = mongoose.model("RO", roSchema)
+const RO = conn.main.model("RO", roSchema)
 
 module.exports = RO

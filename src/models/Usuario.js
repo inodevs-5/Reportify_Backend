@@ -1,4 +1,5 @@
 const mongoose = require("mongoose")
+const conn = require('../config/multipleDbsConnections')
 const { roSchema } = require("./RO")
 const {mensagemSchema} = require('./Mensagem')
 const { Schema } = mongoose
@@ -55,7 +56,7 @@ const usuarioSchema = new Schema({
     }
 )
 
-const Usuario = mongoose.model("Usuario", usuarioSchema)
+const Usuario = conn.main.model("Usuario", usuarioSchema)
 
 module.exports = {
     Usuario,

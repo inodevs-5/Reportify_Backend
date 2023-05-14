@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const conn = require('../config/multipleDbsConnections')
 
 const mensagemSchema = new Schema({
     conteudo: {
@@ -21,6 +22,6 @@ const mensagemSchema = new Schema({
     },
 });
 
-const Mensagem = mongoose.model("Mensagem", mensagemSchema)
+const Mensagem = conn.main.model("Mensagem", mensagemSchema)
 
 module.exports = { Mensagem, mensagemSchema };

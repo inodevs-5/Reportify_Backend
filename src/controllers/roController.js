@@ -1,9 +1,10 @@
+require('dotenv').config();
 const RO = require("../models/RO")
 const mongoose = require('mongoose')
 const notificacao = require("./notificacaoController")
 
 let gfs
-const connect = mongoose.createConnection(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true });
+const connect = mongoose.createConnection(process.env.DB_URL_MAIN, { useNewUrlParser: true, useUnifiedTopology: true });
 connect.once('open', () => {
     gfs = new mongoose.mongo.GridFSBucket(connect.db, {
         bucketName: "anexos"
@@ -149,12 +150,11 @@ const roController = {
                 orgao, 
                 _id: id, 
                 relator: {
-                    id: mongoose.Types.ObjectId(idRelator),
-                    nome: nomeRelator,
+                    id: new mongoose.Types.ObjectId(idRelator),
                     posGrad: posGradRelator
                 },
                 responsavel: {
-                    id:  mongoose.Types.ObjectId(idResponsavel),
+                    id: new mongoose.Types.ObjectId(idResponsavel),
                     nome: nomeResponsavel,
                     posGrad: posGradResponsavel
                 },
@@ -245,12 +245,12 @@ const roController = {
             orgao, 
             _id: id, 
             relator: {
-                id: mongoose.Types.ObjectId(idRelator),
+                id: new mongoose.Types.ObjectId(idRelator),
                 nome: nomeRelator,
                 posGrad: posGradRelator
             },
             responsavel: {
-                id:  mongoose.Types.ObjectId(idResponsavel),
+                id: new mongoose.Types.ObjectId(idResponsavel),
                 nome: nomeResponsavel,
                 posGrad: posGradResponsavel
             },

@@ -9,9 +9,6 @@ app.use(cors())
 
 app.use(express.json())
 
-const conn = require("./config/connDB")
-conn()
-
 const routes = require("./routes/router")
 app.use("/", routes)
 

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const conn = require('../config/multipleDbsConnections')
 const Schema = mongoose.Schema;
+const conn = require('../config/multipleDbsConnections')
 
 const mensagemSchema = new Schema({
     conteudo: {

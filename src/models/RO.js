@@ -78,7 +78,6 @@ const roSchema = new Schema({
                 nome: {
                     type: String, 
                     ref: 'Usuario',
-                    required: true
                 },
                 posGrad: {
                     type: String, 
@@ -110,7 +109,12 @@ const roSchema = new Schema({
         suporte: {
             type: roSuporteSchema,
             _id: false
-        }
+        },        
+        validacaoFechamentoRo: {
+            type: String,
+            enum: ['Encerrado', 'Aberto'],
+            default: 'Aberto'
+        },
     },
 )
 

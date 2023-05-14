@@ -1,6 +1,7 @@
 require('dotenv').config();
 const RO = require("../models/RO")
 const mongoose = require('mongoose')
+const notificacao = require("./notificacaoController")
 
 let gfs
 const connect = mongoose.createConnection(process.env.DB_URL_MAIN, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -54,6 +55,7 @@ const roController = {
                 orgao,
                 idRelator, 
                 nomeResponsavel, 
+                nomeRelator,
                 idResponsavel,
                 classDefeito, 
                 versaoBaseDados, 
@@ -148,11 +150,11 @@ const roController = {
                 orgao, 
                 _id: id, 
                 relator: {
-                    id: mongoose.Types.ObjectId(idRelator),
+                    id: new mongoose.Types.ObjectId(idRelator),
                     posGrad: posGradRelator
                 },
                 responsavel: {
-                    id:  mongoose.Types.ObjectId(idResponsavel),
+                    id: new mongoose.Types.ObjectId(idResponsavel),
                     nome: nomeResponsavel,
                     posGrad: posGradResponsavel
                 },
@@ -171,6 +173,8 @@ const roController = {
                 tituloOcorrencia,
                 descricaoOcorrencia,
             })
+
+            notificacao.criado(idRelator, id, classDefeito, nomeRelator, tituloOcorrencia, descricaoOcorrencia)
 
             res.status(201).json({response, msg: "Registro de Ocorrência criado com sucesso!"})
         } catch (error) {
@@ -241,12 +245,12 @@ const roController = {
             orgao, 
             _id: id, 
             relator: {
-                id: mongoose.Types.ObjectId(idRelator),
+                id: new mongoose.Types.ObjectId(idRelator),
                 nome: nomeRelator,
                 posGrad: posGradRelator
             },
             responsavel: {
-                id:  mongoose.Types.ObjectId(idResponsavel),
+                id: new mongoose.Types.ObjectId(idResponsavel),
                 nome: nomeResponsavel,
                 posGrad: posGradResponsavel
             },
@@ -327,9 +331,6 @@ const roController = {
             }
         }
 
-
-
-
         const updatedRo = await RO.findByIdAndUpdate(id, ro);
 
         if(!updatedRo) {
@@ -359,12 +360,14 @@ const roController = {
 
         updateSuporte: async (req, res) => {
             const id = req.params.id;
+            const ros = await RO.findById(id);
+
             const {
-                fase,  idcolaboradorIACIT, nome, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria 
+                fase,  idcolaboradorIACIT, nome, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria
             } = req.body
-    
+            
             const ro = {
-                suporte: {fase,  colaboradorIACIT:{id: mongoose.Types.ObjectId(idcolaboradorIACIT), nome}, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria} 
+                suporte: {fase: fase.trim(),  colaboradorIACIT:{id: mongoose.Types.ObjectId(idcolaboradorIACIT), nome}, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria} 
             };
     
             const updatedRo = await RO.findByIdAndUpdate(id, ro);
@@ -373,7 +376,9 @@ const roController = {
                 res.status(404).json({ msg:"Registro de ocorrência não encontrado." });
                 return;
             }
-    
+
+            notificacao.atendido(ros.relator.id, id, idcolaboradorIACIT)
+
             res
             .status(200) 
             .json({ ro, msg: "Registro de ocorrência atualizado com sucesso" });
@@ -381,21 +386,18 @@ const roController = {
 
         close: async (req, res) => {
             const id = req.params.id;
+            const ros = await RO.findById(id);
             const {
                     validacaoFechamentoRo
             } = req.body
     
             const ro = { 
-                suporte: {validacaoFechamentoRo}
-                
-
+                close: {validacaoFechamentoRo}
             }
 
             if (!validacaoFechamentoRo) {
                 return res.status(422).json({msg: 'O status do fechamento é obrigatória.'})
             }
-    
-    
     
             const updatedRo = await RO.findByIdAndUpdate(id, ro);
     
@@ -403,7 +405,9 @@ const roController = {
                 res.status(404).json({ msg:"Registro de ocorrência não encontrado." });
                 return;
             }
-    
+
+            notificacao.fechado(ros.relator.id, id, ros.suporte.colaboradorIACIT.id)
+
             res
             .status(200) 
             .json({ ro, msg: "Registro de ocorrência atualizado com sucesso" });

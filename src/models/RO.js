@@ -78,7 +78,6 @@ const roSchema = new Schema({
                 nome: {
                     type: String, 
                     ref: 'Usuario',
-                    required: true
                 },
                 posGrad: {
                     type: String, 

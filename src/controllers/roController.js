@@ -148,11 +148,11 @@ const roController = {
                 orgao, 
                 _id: id, 
                 relator: {
-                    id: mongoose.Types.ObjectId(idRelator),
+                    id: new mongoose.Types.ObjectId(idRelator),
                     posGrad: posGradRelator
                 },
                 responsavel: {
-                    id:  mongoose.Types.ObjectId(idResponsavel),
+                    id: new mongoose.Types.ObjectId(idResponsavel),
                     nome: nomeResponsavel,
                     posGrad: posGradResponsavel
                 },
@@ -241,12 +241,12 @@ const roController = {
             orgao, 
             _id: id, 
             relator: {
-                id: mongoose.Types.ObjectId(idRelator),
+                id: new mongoose.Types.ObjectId(idRelator),
                 nome: nomeRelator,
                 posGrad: posGradRelator
             },
             responsavel: {
-                id:  mongoose.Types.ObjectId(idResponsavel),
+                id: new mongoose.Types.ObjectId(idResponsavel),
                 nome: nomeResponsavel,
                 posGrad: posGradResponsavel
             },

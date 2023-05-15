@@ -24,4 +24,8 @@ router.route("/cliente/:id").patch((req, res) => roController.updateCliente(req,
 
 router.route("/close/:id").patch((req, res) => roController.close(req, res))
 
+router.route("/relator/search/:id/:search").get((req, res) => roController.searchRelator(req, res))
+
+router.route("/atribuido/search/:id/:search").get((req, res) => roController.searchAtribuido(req, res))
+
 module.exports = router

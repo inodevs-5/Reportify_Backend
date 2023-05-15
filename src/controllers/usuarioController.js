@@ -131,7 +131,19 @@ const usuarioController = {
     try {
       const usuarios = await Usuario.find()
 
-      res.json(usuarios)
+      const keys = await Crypto.find()
+
+      const response = []
+      for (let u=0; u<usuarios.length; u++) {
+        for (let k=0; k<keys.length; k++) {
+          if (String(usuarios[u]._id) === String(keys[k].usuario)) {
+            response.push(usuarios[u])
+
+          }
+        }
+      }
+
+      res.json(response)
     } catch (error) {
       console.log(error)
       res.status(500).json({msg: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"})
@@ -192,84 +204,97 @@ const usuarioController = {
     }
   },
 
-    updatePassword: async(req, res) => {
-        const { id } = req.params;
-        const { senha, confirmarSenha } = req.body;
+  updatePassword: async(req, res) => {
+      const { id } = req.params;
+      const { senha, confirmarSenha } = req.body;
 
-        try {
-            const usuario = await Usuario.findById(id);
+      try {
+          const usuario = await Usuario.findById(id);
 
-            if (!usuario) {
-                return res.status(404).json({ msg: 'Usuário não encontrado' });
-            }
+          if (!usuario) {
+              return res.status(404).json({ msg: 'Usuário não encontrado' });
+          }
 
-            if (senha !== confirmarSenha) {
-                return res.status(422).json({ msg: 'As senhas não conferem!' });
-            }
-            if (senha.length < 8) {
-                return res.status(422).json({ msg: 'A senha deve conter pelo menos 8 caracteres!' });
-            }
-            if (!senha.match(/[a-z]+/)) {
-                return res.status(422).json({ msg: 'A senha precisa possuir pelo menos uma letra minúscula!' });
-            }
-            if (!senha.match(/[A-Z]+/)) {
-                return res.status(422).json({ msg: 'A senha precisa possuir pelo menos uma letra maiúscula!' });
-            }
-            if (!senha.match(/[0-9]+/)) {
-                return res.status(422).json({ msg: 'A senha precisa possuir pelo menos um número!' });
-            }
-            if (!senha.match(/[@#$%&*><+\-_=.,;/()[\]{}?'"|\\]/)) {
-                return res.status(422).json({ msg: 'A senha precisa possuir pelo menos um caracter especial!' });
-            }
+          if (senha !== confirmarSenha) {
+              return res.status(422).json({ msg: 'As senhas não conferem!' });
+          }
+          if (senha.length < 8) {
+              return res.status(422).json({ msg: 'A senha deve conter pelo menos 8 caracteres!' });
+          }
+          if (!senha.match(/[a-z]+/)) {
+              return res.status(422).json({ msg: 'A senha precisa possuir pelo menos uma letra minúscula!' });
+          }
+          if (!senha.match(/[A-Z]+/)) {
+              return res.status(422).json({ msg: 'A senha precisa possuir pelo menos uma letra maiúscula!' });
+          }
+          if (!senha.match(/[0-9]+/)) {
+              return res.status(422).json({ msg: 'A senha precisa possuir pelo menos um número!' });
+          }
+          if (!senha.match(/[@#$%&*><+\-_=.,;/()[\]{}?'"|\\]/)) {
+              return res.status(422).json({ msg: 'A senha precisa possuir pelo menos um caracter especial!' });
+          }
 
-            const salt = await bcrypt.genSalt(12);
-            const senhaHash = await bcrypt.hash(senha, salt);
-            usuario.senha = senhaHash;
+          const salt = await bcrypt.genSalt(12);
+          const senhaHash = await bcrypt.hash(senha, salt);
+          usuario.senha = senhaHash;
 
-            await usuario.save();
-            res.status(200).json({ msg: 'Sua senha foi atualizada com sucesso!' });
-        } catch (error) {
-            console.log(error);
-            res.status(500).json({ msg: "Aconteceu um erro no servidor, tente novamente mais tarde" });
-        }
-    },
+          await usuario.save();
+          res.status(200).json({ msg: 'Sua senha foi atualizada com sucesso!' });
+      } catch (error) {
+          console.log(error);
+          res.status(500).json({ msg: "Aconteceu um erro no servidor, tente novamente mais tarde" });
+      }
+  },
 
-    emailRedefinicao: async(req, res) => {
-        const { email } = req.body;
+  emailRedefinicao: async(req, res) => {
+      const { email } = req.body;
 
-        try {
+      try {
 
-            if (!email) {
-                return res.status(422).json({ msg: 'O email é obrigatório!' });
-            }
+          if (!email) {
+              return res.status(422).json({ msg: 'O email é obrigatório!' });
+          }
 
-            const usuario = await Usuario.findOne({email});
+          const usuario = await Usuario.findOne({email});
 
-            if (!usuario) {
-                return res.status(404).json({ msg: 'Email não encontrado.' });
-            }
+          if (!usuario) {
+              return res.status(404).json({ msg: 'Email não encontrado.' });
+          }
 
-            transporter.sendMail({
-                from: `Inodevs <${process.env.USER_EMAIL}>`,
-                to: email,
-                subject: "Email de Redefinição de Senha do Reportify.",
-                html: `
-                    <h2>Redefinição de Senha</h2>
-                    <p>Foi solicitado a redefinição de senha no aplicativo. Com o aplicativo instalado no seu celular, clique <a href="http://reportify-app-inodevs-2023/senha/${usuario._id}/${false}">aqui</a> para redefinir sua senha.
-                `
-            }).then(message => {
-                console.log(message)
-            }).catch(error => {
-                console.log(error)
-                return res.status(422).json({msg: 'Erro ao enviar o email'})
-            })
+          transporter.sendMail({
+              from: `Inodevs <${process.env.USER_EMAIL}>`,
+              to: email,
+              subject: "Email de Redefinição de Senha do Reportify.",
+              html: `
+                  <h2>Redefinição de Senha</h2>
+                  <p>Foi solicitado a redefinição de senha no aplicativo. Com o aplicativo instalado no seu celular, clique <a href="http://reportify-app-inodevs-2023/senha/${usuario._id}/${false}">aqui</a> para redefinir sua senha.
+              `
+          }).then(message => {
+              console.log(message)
+          }).catch(error => {
+              console.log(error)
+              return res.status(422).json({msg: 'Erro ao enviar o email'})
+          })
 
-            res.status(200).json({ msg: 'Solicitação de redefinição de senha enviada para ' + email + '!' });
-        } catch (error) {
-            console.log(error);
-            res.status(500).json({ msg: "Aconteceu um erro no servidor, tente novamente mais tarde" });
-        }
-    },
+          res.status(200).json({ msg: 'Solicitação de redefinição de senha enviada para ' + email + '!' });
+      } catch (error) {
+          console.log(error);
+          res.status(500).json({ msg: "Aconteceu um erro no servidor, tente novamente mais tarde" });
+      }
+  },
+
+  search: async(req, res) => {
+    const { nome } = req.params;
+
+    try {
+        const usuarios = await Usuario.find({nome: RegExp(nome, 'i')})
+
+        res.json(usuarios);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: "Aconteceu um erro no servidor, tente novamente mais tarde" });
+    }
+  },
 
 }
 

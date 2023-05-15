@@ -1,7 +1,5 @@
 const mongoose = require("mongoose")
 const conn = require('../config/multipleDbsConnections')
-const { roSchema } = require("./RO")
-const {mensagemSchema} = require('./Mensagem')
 const { Schema } = mongoose
 
 const usuarioSchema = new Schema({
@@ -35,23 +33,19 @@ const usuarioSchema = new Schema({
             colaboradoIACIT:{
                 type: Schema.Types.ObjectId,
                 ref: 'RO',
-                
             },
             idRo: {
                 type: Number,
                 ref: 'RO',
-                
             },
             mensagem: {
                 type: String,
-                
             },
             data:{
                 type: Date,
                 required: true,
                 default: new Date().toLocaleString("en-US", {timezone: 'America/Sao_Paulo'})
             },
-            
         }]
     }
 )

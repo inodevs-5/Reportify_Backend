@@ -131,7 +131,19 @@ const usuarioController = {
     try {
       const usuarios = await Usuario.find()
 
-      res.json(usuarios)
+      const keys = await Crypto.find()
+
+      const response = []
+      for (let u=0; u<usuarios.length; u++) {
+        for (let k=0; k<keys.length; k++) {
+          if (String(usuarios[u]._id) === String(keys[k].usuario)) {
+            response.push(usuarios[u])
+
+          }
+        }
+      }
+
+      res.json(response)
     } catch (error) {
       console.log(error)
       res.status(500).json({msg: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"})

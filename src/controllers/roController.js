@@ -27,7 +27,7 @@ const roController = {
     getByRelator : async(req, res) => {
         try {
             const { id } = req.params
-            const ros = await RO.find({"relator.id": id})
+            const ros = await RO.find({"relator.id": id}).populate(['relator.id', 'suporte.colaboradorIACIT.id']);
 
             res.json(ros)
         } catch (error) {
@@ -172,6 +172,9 @@ const roController = {
                 },
                 tituloOcorrencia,
                 descricaoOcorrencia,
+                // suporte: {
+                //     fase: 'pendente'
+                // }
             })
 
             notificacao.criado(idRelator, id, classDefeito, nomeRelator, tituloOcorrencia, descricaoOcorrencia)
@@ -362,26 +365,47 @@ const roController = {
         const id = req.params.id;
         const ros = await RO.findById(id);
 
+        if (!ros) {
+            return res.status(404).json({ msg: 'Usuário não encontrado' });
+        }
+  
         const {
             fase,  idcolaboradorIACIT, nome, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria
         } = req.body
-        
-        const ro = {
-            suporte: {fase: fase.trim(),  colaboradorIACIT:{id: mongoose.Types.ObjectId(idcolaboradorIACIT), nome}, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria} 
-        };
 
-        const updatedRo = await RO.findByIdAndUpdate(id, ro);
+        if (ros.suporte) {
+                       ros.suporte.fase = fase || ros.suporte.fase;
+            ros.suporte.colaboradorIACIT.id = idcolaboradorIACIT || ros.suporte.colaboradorIACIT.id;
+            ros.suporte.defeito = defeito || ros.suporte.defeito
+            ros.suporte.classificacao = classificacao || ros.suporte.classificacao;
+            ros.suporte.melhoria = melhoria || ros.suporte.melhoria;
+            ros.suporte.outros = outros || ros.suporte.outros;
+            ros.suporte.justificativaReclassificacao = justificativaReclassificacao || ros.suporte.justificativaReclassificacao
+            ros.suporte.categoria = categoria || ros.suporte.categoria 
 
-        if(!updatedRo) {
-            res.status(404).json({ msg:"Registro de ocorrência não encontrado." });
-            return;
+            await ros.save()
+
+            res
+            .status(200) 
+            .json({ ros, msg: "Registro de ocorrência atualizado com sucesso" });
+        } else { 
+            const ro = {
+                suporte: {fase,  colaboradorIACIT:{id: new mongoose.Types.ObjectId(idcolaboradorIACIT), nome}, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria} 
+            };
+
+            const updatedRo = await RO.findByIdAndUpdate(id, ro);
+
+            if(!updatedRo) {
+                res.status(404).json({ msg:"Registro de ocorrência não encontrado." });
+                return;
+            }
+
+            res
+            .status(200) 
+            .json({ updatedRo, msg: "Registro de ocorrência atualizado com sucesso" });
         }
 
         notificacao.atendido(ros.relator.id, id, idcolaboradorIACIT)
-
-        res
-        .status(200) 
-        .json({ ro, msg: "Registro de ocorrência atualizado com sucesso" });
     },
 
     close: async (req, res) => {

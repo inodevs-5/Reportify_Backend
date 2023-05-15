@@ -74,10 +74,6 @@ const roSchema = new Schema({
                     ref: 'Usuario',
                     required: true
                 },
-                nome: {
-                    type: String, 
-                    ref: 'Usuario',
-                },
                 posGrad: {
                     type: String, 
                     required: true
@@ -88,11 +84,6 @@ const roSchema = new Schema({
         }, 
         responsavel: {
             type: {
-                id: { 
-                    type: Schema.Types.ObjectId, 
-                    ref: 'Usuario',
-                    required: true
-                },
                 nome: {
                     type: String, 
                     ref: 'Usuario',

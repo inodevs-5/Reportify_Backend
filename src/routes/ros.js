@@ -14,7 +14,7 @@ router.route("/").post(upload.array('anexo'), (req, res) => roController.create(
 
 router.route("/search/:search").get((req, res) => roController.search(req, res))
 
-router.route("/download/:id").get((req, res) => roController.download(req, res))
+router.route("/download/:filename").get((req, res) => roController.download(req, res))
 
 router.route("/:id").get((req, res) => roController.get(req, res))
 

@@ -5,7 +5,7 @@ const { Schema } = mongoose
 const roSuporteSchema = new Schema ({
         fase: {
             type: String,
-            // enum: ['pendente', 'andamento', 'validacao', 'concluido'],
+            enum: ['pendente', 'andamento', 'validacao', 'concluido'],
             required: true,
             default: 'pendente'
         },
@@ -30,19 +30,19 @@ const roSuporteSchema = new Schema ({
         },
         classificacao: {
             type: String,
-            // enum: ['defeito', 'melhoria', 'outros'],
+            enum: ['defeito', 'melhoria', 'outros'],
         }, 
         defeito: {
             type: String,
-            // enum: ['critico', 'alto', 'baixo'],
+            enum: ['critico', 'alto', 'baixo'],
         }, 
         melhoria: {
             type: String,
-            // enum: ['funcionalidadeexistente', 'funcionalidadenaoexistente'],
+            enum: ['funcionalidade existente', 'funcionalidade nao existente'],
         },
         outros: {
             type: String,
-            // enum: ['investigacao', 'causaexterna'],
+            enum: ['investigacao', 'causa externa'],
         }, 
         justificativaReclassificacao: {
             type: String,

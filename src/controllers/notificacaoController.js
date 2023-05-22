@@ -38,10 +38,6 @@ const emailNotificacao = {
             })
 
             await usuario.save()
-
-            if (!usuario) {
-                return { error: 'Usuário não encontrado' };
-            }
             
             const cadastroRO = {
                 from: `Inodevs <${process.env.EMAIL}>`,
@@ -78,57 +74,56 @@ const emailNotificacao = {
 
             const usuario_adm = await Usuario.findById(adm_id);
 
-            usuario.notificacoes.push({
-                idRo: _id,
-                mensagem: `Registro de Ocorrência ${ro._id} atendido`
-            })
+            if (ro.suporte.fase === 'validacao') {
 
-            await usuario.save()
+                usuario.notificacoes.push({
+                    idRo: _id,
+                    mensagem: `Registro de Ocorrência ${ro._id} atendido`
+                })
+    
+                await usuario.save()
+    
+                usuario_adm.notificacoes.push({
+                    idRo: _id,
+                    mensagem: `Registro de Ocorrência ${ro._id} atendido`
+                })
+    
+                await usuario_adm.save()
 
-            usuario_adm.notificacoes.push({
-                idRo: _id,
-                mensagem: `Registro de Ocorrência ${ro._id} atendido`
-            })
+                const RoAtendido = {
+                    from: `Inodevs <${process.env.EMAIL}>`,
+                    to: usuario.email,
+                    subject: 'Alteração do status do registro de ocorrência',
+                    html: `
+                        <h1>RO ${ro._id}</h1>
+                        <p>Olá senhor(a) ${usuario.nome}, esse email foi enviado para lhe informar que o RO ${ro._id}, foi atendido.
+                            Entre no aplicativo para confirmar se o atendimente resolve seu problema</p>
+                            <p><strong>Status atual: </strong>Atendido</p>
+                    `
+                }
+    
+                const RoAtendidoAdm = {
+                    from: `Inodevs <${process.env.EMAIL}>`,
+                    to: usuario_adm.email,
+                    subject: 'teste de envio de email',
+                    html:  `
+                        <h1>RO ${ro._id}</h1>
+                        <p>Olá senhor(a) ${usuario_adm.nome}, esse email foi enviado para lhe informar que o RO ${ro._id} que você atendeu, já foi encaminhado para o relator.</p>
+                            <p><strong>Status atual: </strong>Atendido</p>
+                    `
+                }    
 
-            await usuario_adm.save()
+                sendEmail(RoAtendido)
 
-            if (!usuario) {
-                return { error: 'Usuário não encontrado' };
-            }
-            
-            const RoAtendido = {
-                from: `Inodevs <${process.env.EMAIL}>`,
-                to: usuario.email,
-                subject: 'Alteração do status do registro de ocorrência',
-                html: `
-                    <h1>RO ${ro._id}</h1>
-                    <p>Olá senhor(a) ${usuario.nome}, esse email foi enviado para lhe informar que o RO ${ro._id}, foi atendido.
-                        Entre no aplicativo para confirmar se o atendimente resolve seu problema</p>
-                        <p><strong>Status atual: </strong>Atendido</p>
-                `
-            }
-
-            const RoAtendidoAdm = {
-                from: `Inodevs <${process.env.EMAIL}>`,
-                to: usuario_adm.email,
-                subject: 'teste de envio de email',
-                html:  `
-                    <h1>RO ${ro._id}</h1>
-                    <p>Olá senhor(a) ${usuario_adm.nome}, esse email foi enviado para lhe informar que o RO ${ro._id} que você atendeu, já foi encaminhado para o relator.</p>
-                        <p><strong>Status atual: </strong>Atendido</p>
-                `
-            }
-
-            sendEmail(RoAtendido)
-
-            sendEmail(RoAtendidoAdm)
+                sendEmail(RoAtendidoAdm)
+            } 
         } catch (error) {
             console.log(error)
             return {error: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"}
         }
     },
 
-    fechado: async (id, _id, adm_id) => {
+    fechado: async (id, _id, adm_id, validacaoFechamentoRo) => {
         try {
             const ro = await RO.findById(_id);
 
@@ -136,50 +131,81 @@ const emailNotificacao = {
 
             const usuario_adm = await Usuario.findById(adm_id);
 
-            usuario.notificacoes.push({
-                idRo: _id,
-                mensagem: `Registro de Ocorrência ${ro._id} fechado`
-            })
-
-            await usuario.save()
-
-            usuario_adm.notificacoes.push({
-                idRo: _id,
-                mensagem: `Registro de Ocorrência ${ro._id} fechado`
-            })
-
-            await usuario_adm.save()
-
-            if (!usuario || !usuario_adm) {
-                return { error: 'Usuário não encontrado' };
-            }
-
-            const RoFechado = {
+            let RoFechado = {
                 from: `Inodevs <${process.env.EMAIL}>`,
                 to: usuario.email,
                 subject: 'Registro de Ocorrência encerrado',
-                html: `
-                    <h1>RO ${ro._id}</h1>
-                    <p>Olá senhor(a) ${usuario.nome}, esse email foi enviado para lhe informar que o RO ${ro._id}, foi concluído.
-                        Qualquer erro entre em contato com algum colaborador via chat</p>
-                        <p><strong>Status atual: </strong>Concluído</p>
-                `
+                html: ``
             }
 
-            const RoFechadoAdm = {
+            let RoFechadoAdm = {
                 from: `Inodevs <${process.env.EMAIL}>`,
                 to: usuario_adm.email,
                 subject: 'Registro de Ocorrência encerrado',
-                html:  `
-                <h1>RO ${ro._id}</h1>
-                <p>Olá senhor(a) ${usuario_adm.nome}, esse email foi enviado para lhe informar que o RO ${ro._id} que você atendeu, foi fechado, pois atendeu o problema do relator.</p>
-                    <p><strong>Status atual: </strong>Concluído</p>
-            `
+                html:  ``
             }
 
-            sendEmail(RoFechado)
+            if (validacaoFechamentoRo === "Encerrado") {
+                RoFechado.html = `
+                    <h1>RO ${ro._id}</h1>
+                    <p>Olá senhor(a) ${usuario.nome}, esse email foi enviado para lhe informar que o RO ${ro._id} foi concluído.
+                        Qualquer erro entre em contato com algum colaborador via chat.</p>
+                        <p><strong>Status atual: </strong>Concluído</p>
+                `
+    
+                RoFechadoAdm.html = `
+                    <h1>RO ${ro._id}</h1>
+                    <p>Olá senhor(a) ${usuario_adm.nome}, esse email foi enviado para lhe informar que o RO ${ro._id} que você atendeu foi fechado, pois atendeu o problema do relator.</p>
+                        <p><strong>Status atual: </strong>Concluído</p>
+                `
 
-            sendEmail(RoFechadoAdm)
+                usuario.notificacoes.push({
+                    idRo: _id,
+                    mensagem: `Registro de Ocorrência ${ro._id} fechado`
+                })
+    
+                await usuario.save()
+    
+                usuario_adm.notificacoes.push({
+                    idRo: _id,
+                    mensagem: `Registro de Ocorrência ${ro._id} fechado`
+                })
+    
+                await usuario_adm.save()
+    
+                if (!usuario || !usuario_adm) {
+                    return { error: 'Usuário não encontrado' };
+                }
+
+                sendEmail(RoFechado)
+                sendEmail(RoFechadoAdm)
+
+            } else if (validacaoFechamentoRo === "Recusado") {
+                RoFechado.html = `
+                    <h1>RO ${ro._id}</h1>
+                    <p>Olá senhor(a) ${usuario.nome}, esse email foi enviado para lhe informar que você recusou o RO ${ro._id} e ele foi enviado novamente para um colaborador fazer a revisão.
+                        Qualquer erro entre em contato com algum colaborador via chat.</p>
+                        <p><strong>Status atual: </strong>Em andamento</p>
+                `
+    
+                RoFechadoAdm.html = `
+                    <h1>RO ${ro._id}</h1>
+                    <p>Olá senhor(a) ${usuario_adm.nome}, esse email foi enviado para lhe informar que o RO ${ro._id} que você atendeu, foi recusado pelo relator, pois o problema não foi solucionado.</p>
+                    <p>Entre no aplicativo, analise a justificativa do relator, revise o registro de ocorrência e reenvie uma resposta ou, caso necessário, entre em contato com o relator via chat do aplicativo.</p>
+                    <p><strong>Status atual: </strong>Em andamento</p>
+                `
+
+                usuario_adm.notificacoes.push({
+                    idRo: _id,
+                    mensagem: `Registro de Ocorrência ${ro._id} recusado`
+                })
+
+                await usuario_adm.save()
+
+                sendEmail(RoFechado)
+                sendEmail(RoFechadoAdm)
+            }
+
         } catch (error) {
             console.log(error)
             return {error: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"}

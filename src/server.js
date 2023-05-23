@@ -12,10 +12,10 @@ app.use(express.json())
 const routes = require("./routes/router")
 app.use("/", routes)
 
-port = process.env.PORT || 3001
+port = process.env.PORT || 3000
 
 app.listen(port, function() {
     console.log("Servidor rodando na porta", port)
 })
 
-dbBackup()
+// dbBackup()

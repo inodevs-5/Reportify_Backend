@@ -13,4 +13,7 @@ router.use("/login", loginRouter)
 const mensagemRouter = require("./mensagem")
 router.use("/mensagem", checkToken, mensagemRouter)
 
+const termoRouter = require("./termo")
+router.use("/termo", checkToken, termoRouter)
+
 module.exports = router;

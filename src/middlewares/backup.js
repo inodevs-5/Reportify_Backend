@@ -16,7 +16,7 @@ const dbBackup = () => {
   
   // utilizando data atual como nome do arquivo de backup
   const currentDate = new Date()
-  var backupDirName = currentDate.getDate() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getFullYear() + '.gzip';
+  var backupDirName = currentDate.getDate() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getFullYear() + '-' + currentDate.getMinutes() +  '.gzip';
 
   // criando pasta que será salvo o backup
   const backupDirPath = path.join(__dirname + '\\backup', backupDirName);

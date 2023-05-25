@@ -28,4 +28,6 @@ router.route("/relator/search/:id/:search").get((req, res) => roController.searc
 
 router.route("/atribuido/search/:id/:search").get((req, res) => roController.searchAtribuido(req, res))
 
+router.route("/image/:filename").get((req, res) => roController.getImage(req, res))
+
 module.exports = router

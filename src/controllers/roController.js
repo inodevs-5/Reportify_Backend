@@ -494,6 +494,18 @@ const roController = {
             res.status(500).json({msg: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"})
         }
     },
+    
+    getImage: (req, res) => {
+        gfs.find({ filename: req.params.filename }).toArray((err, files) => {
+            if (!files[0] || files.length === 0) {
+                return res.status(404).json({
+                    msg: 'Arquivo não encontrado',
+                });
+            }
+
+            res.status(200).json(files[0]);
+        });
+    }
 
 }
 

@@ -1,6 +1,9 @@
 const router = require("express").Router()
 const { checkToken } = require("../middlewares/authMiddleware")
 
+const roController = require("../controllers/roController")
+router.route("/download/:filename").get((req, res) => roController.download(req, res))
+
 const rosRouter = require("./ros")
 router.use("/ro", checkToken, rosRouter)
 

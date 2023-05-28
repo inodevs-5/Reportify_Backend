@@ -20,19 +20,20 @@ function sendEmail (email) {
             return
         }
         console.log('Email enviado com sucesso!')
+        mostrarNumeroNotificacoes()
+        console.log(numeroNotificacoes)
     })
 }
 const emailNotificacao = {
     criado: async (id, _id) => {
-        console.log("tamo ai")
         try {
             const usuario = await Usuario.findById(id);
 
             const ro = await RO.findById(_id).populate(["relator.id"])
 
-            console.log(usuario.notificacoes) 
+            console.log(Usuario.notificacoes) 
 
-            usuario.notificacoes.push({
+            Usuario.notificacoes.push({
                 idRo: _id,
                 mensagem: `Registro de Ocorrência ${ro._id} cadastrado`
             })
@@ -185,6 +186,24 @@ const emailNotificacao = {
             return {error: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"}
         }
     },
+}
+
+async function mostrarNumeroNotificacoes()  {
+    const notificacao = await Usuario.notificacoes.find({ visualizada: false });
+    const numeroNotificacoes = Usuario.notificacoes.length;
+    // console.log(numeroNotificacoes)
+}
+
+async function marcarNotificacoesVistas() {
+    // numeroNotificacoes: Usuario.notificacoes.update({ visualizada: false }, { visualizada: true })
+    const num_notificacoes = await Usuario.notificacoes.find({ visualizada: false });
+
+    for (const notificacao of num_notificacoes) {
+      notificacao.visualizada = true;
+      await notificacao.save();
+    }
+  
+    mostrarNumeroNotificacoes();
 }
 
 module.exports = emailNotificacao

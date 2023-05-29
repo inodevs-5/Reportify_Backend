@@ -13,4 +13,7 @@ router.use("/login", loginRouter)
 const mensagemRouter = require("./mensagem")
 router.use("/mensagem", checkToken, mensagemRouter)
 
+const notifcacaoRouter = require("./notificacoes")
+router.use("/notificacao", checkToken, notifcacaoRouter)
+
 module.exports = router;

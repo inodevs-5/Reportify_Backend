@@ -47,7 +47,7 @@ const usuarioSchema = new Schema({
                 default: new Date().toLocaleString("en-US", {timezone: 'America/Sao_Paulo'})
             },
             visualizar:{
-                type: Boolean,
+                type: Boolean
             }
         }]
     }

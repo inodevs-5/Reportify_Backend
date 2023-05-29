@@ -6,12 +6,13 @@ require('dotenv').config()
 function sendEmail (email) {
     console.log(email)
     const transportador = nodemailer.createTransport({
-        host: 'smtp-mail.outlook.com',
+        host: process.env.HOST_EMAIL,
+        port: process.env.PORT_EMAIL,
         service: 'hotmail',
         secure: false,
         auth: {
-            user: process.env.EMAIL,
-            pass: process.env.SENHA
+            user: process.env.USER_EMAIL,
+            pass: process.env.PASS_EMAIL
         }
     })
     transportador.sendMail(email, (err) => {
@@ -20,8 +21,8 @@ function sendEmail (email) {
             return
         }
         console.log('Email enviado com sucesso!')
-        mostrarNumeroNotificacoes()
-        console.log(numeroNotificacoes)
+        // mostrarNumeroNotificacoes()
+        // marcarNotificacoesVistas()
     })
 }
 const emailNotificacao = {
@@ -33,9 +34,10 @@ const emailNotificacao = {
 
             console.log(Usuario.notificacoes) 
 
-            Usuario.notificacoes.push({
+            usuario.notificacoes.push({
                 idRo: _id,
-                mensagem: `Registro de Ocorrência ${ro._id} cadastrado`
+                mensagem: `Registro de Ocorrência ${ro._id} cadastrado`,
+                visualizar: false
             })
 
             await usuario.save()
@@ -45,7 +47,7 @@ const emailNotificacao = {
             }
             
             const cadastroRO = {
-                from: `Inodevs <${process.env.EMAIL}>`,
+                from: `Inodevs <${process.env.USER_EMAIL}>`,
                 to: usuario.email,
                 subject: 'Novo Registro de Ocorrência cadastrado',
                 html: `
@@ -81,14 +83,16 @@ const emailNotificacao = {
 
             usuario.notificacoes.push({
                 idRo: _id,
-                mensagem: `Registro de Ocorrência ${ro._id} atendido`
+                mensagem: `Registro de Ocorrência ${ro._id} atendido`,
+                visualizar: false
             })
 
             await usuario.save()
 
             usuario_adm.notificacoes.push({
                 idRo: _id,
-                mensagem: `Registro de Ocorrência ${ro._id} atendido`
+                mensagem: `Registro de Ocorrência ${ro._id} atendido`,
+                visualizar: false
             })
 
             await usuario_adm.save()
@@ -98,7 +102,7 @@ const emailNotificacao = {
             }
             
             const RoAtendido = {
-                from: `Inodevs <${process.env.EMAIL}>`,
+                from: `Inodevs <${process.env.USER_EMAIL}>`,
                 to: usuario.email,
                 subject: 'Alteração do status do registro de ocorrência',
                 html: `
@@ -110,7 +114,7 @@ const emailNotificacao = {
             }
 
             const RoAtendidoAdm = {
-                from: `Inodevs <${process.env.EMAIL}>`,
+                from: `Inodevs <${process.env.USER_EMAIL}>`,
                 to: usuario_adm.email,
                 subject: 'teste de envio de email',
                 html:  `
@@ -139,14 +143,16 @@ const emailNotificacao = {
 
             usuario.notificacoes.push({
                 idRo: _id,
-                mensagem: `Registro de Ocorrência ${ro._id} fechado`
+                mensagem: `Registro de Ocorrência ${ro._id} fechado`,
+                visualizar: false
             })
 
             await usuario.save()
 
             usuario_adm.notificacoes.push({
                 idRo: _id,
-                mensagem: `Registro de Ocorrência ${ro._id} fechado`
+                mensagem: `Registro de Ocorrência ${ro._id} fechado`,
+                visualizar: false
             })
 
             await usuario_adm.save()
@@ -156,7 +162,7 @@ const emailNotificacao = {
             }
 
             const RoFechado = {
-                from: `Inodevs <${process.env.EMAIL}>`,
+                from: `Inodevs <${process.env.USER_EMAIL}>`,
                 to: usuario.email,
                 subject: 'Registro de Ocorrência encerrado',
                 html: `
@@ -168,7 +174,7 @@ const emailNotificacao = {
             }
 
             const RoFechadoAdm = {
-                from: `Inodevs <${process.env.EMAIL}>`,
+                from: `Inodevs <${process.env.USER_EMAIL}>`,
                 to: usuario_adm.email,
                 subject: 'Registro de Ocorrência encerrado',
                 html:  `
@@ -186,24 +192,38 @@ const emailNotificacao = {
             return {error: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"}
         }
     },
-}
 
-async function mostrarNumeroNotificacoes()  {
-    const notificacao = await Usuario.notificacoes.find({ visualizada: false });
-    const numeroNotificacoes = Usuario.notificacoes.length;
-    // console.log(numeroNotificacoes)
-}
+    mostrarNotificacoes: async function mostrarNumeroNotificacoes(req, res)  {
+        const { id } = req.params
 
-async function marcarNotificacoesVistas() {
-    // numeroNotificacoes: Usuario.notificacoes.update({ visualizada: false }, { visualizada: true })
-    const num_notificacoes = await Usuario.notificacoes.find({ visualizada: false });
+        const notificacao = await Usuario.findOne({ _id: id});
 
-    for (const notificacao of num_notificacoes) {
-      notificacao.visualizada = true;
-      await notificacao.save();
+        let numeroNotificacoes = 0
+        for (let n = 0; n < notificacao.notificacoes.length; n++) {
+            if (notificacao.notificacoes[n].visualizar === false){
+                numeroNotificacoes++
+            }
+        }
+        res.status(200).json({numeroNotificacoes})
+    },
+    
+    marcarNotificacoes: async function marcarNotificacoesVistas(req, res) {
+        const { id } = req.body
+
+        const notificacao = await Usuario.findOne({ _id: id});
+
+        for (let n = 0; n < notificacao.notificacoes.length; n++) {
+            if (notificacao.notificacoes[n].visualizar === false){
+                notificacao.notificacoes[n].visualizar = true
+            }
+        }
+
+        notificacao.save()
+      
+        res.status(200).json({notificacao, msg: "Notificações visualizadas com sucesso."})
     }
-  
-    mostrarNumeroNotificacoes();
 }
+
+
 
 module.exports = emailNotificacao

@@ -13,6 +13,9 @@ router.use("/login", loginRouter)
 const mensagemRouter = require("./mensagem")
 router.use("/mensagem", checkToken, mensagemRouter)
 
+const dashboardRouter = require("./dashboard")
+router.use("/dashboard", checkToken, dashboardRouter)
+
 const backup = require("../middlewares/backup")
 router.post("/forceBackup", backup.dbBackup);
 

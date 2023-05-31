@@ -67,7 +67,8 @@ const roController = {
                 tituloOcorrencia,
                 descricaoOcorrencia,
                 posGradRelator,
-                posGradResponsavel
+                posGradResponsavel,
+                dataRegistro
             } = req.body
             
             if (!contrato) {
@@ -165,6 +166,7 @@ const roController = {
                     partNumber,
                     serialNumber,
                 },
+                dataRegistro,
                 opcoesSoftware: {
                     versaoBaseDados, 
                     versaoSoftware,

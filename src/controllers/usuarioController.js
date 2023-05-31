@@ -22,7 +22,7 @@ const usuarioController = {
     if (!contato_empresa) {
       return res.status(422).json({ msg: "Contato_empresa é Obrigatorio"})
     }
-    
+
     // check if user exist
     const usuarioExists = await Usuario.findOne({ email: email})
 
@@ -57,7 +57,7 @@ const usuarioController = {
         userCreated.contato_empresa = encryptUserDataField(userCreated.contato_empresa, crypto);
         userCreated.save();
       });
-      
+
       // Enviando e-mail para o usuário redefinir a senha
       transporter.sendMail({
           from: `Inodevs <${process.env.USER_EMAIL}>`,
@@ -128,35 +128,54 @@ const usuarioController = {
       }
 
       const decryptedUser = await decryptUserDataField(usuario);
-      console.log("Decrypted user", decryptedUser);
+      const nomeUsuario = decryptedUser.nome;
+      const emailUsuario = decryptedUser.email;
+      const empresaUsuario = decryptedUser.empresa;
+      const contato_empresaUsuario = decryptedUser.contato_empresa;
 
-      res.status(200).json(usuario);
+      const decryptedUserData = {
+        nomeUsuario,
+        emailUsuario,
+        empresaUsuario,
+        contato_empresaUsuario,
+      }
+
+      res.status(200).json(decryptedUserData);
     } catch (error) {
       console.log(error);
+      if (error.message === 'Usuário não encontrado') {
+        return res.status(404).json({ msg: 'Usuário não encontrado' });
+      }
       res.status(500).json({ msg: "Aconteceu um erro no servidor, tente novamente mais tarde" });
     }
   },
 
-  getAll: async(req, res) => {
+  getAll: async (req, res) => {
     try {
-      const usuarios = await Usuario.find()
+      const usuarios = await Usuario.find();
+      const keys = await Crypto.find();
 
-      const keys = await Crypto.find()
+      const decryptedUsers = [];
 
-      const response = []
-      for (let u=0; u<usuarios.length; u++) {
-        for (let k=0; k<keys.length; k++) {
-          if (String(usuarios[u]._id) === String(keys[k].usuario)) {
-            response.push(usuarios[u])
+      for (let u = 0; u < usuarios.length; u++) {
+        const usuario = usuarios[u];
+        const key = keys.find(k => String(usuario._id) === String(k.usuario));
 
-          }
+        if (key) {
+          const decryptedUser = await decryptUserDataField(usuario, key);
+          decryptedUsers.push({
+            nome: decryptedUser.nome,
+            email: decryptedUser.email,
+            empresa: decryptedUser.empresa,
+            contato_empresa: decryptedUser.contato_empresa
+          });
         }
       }
-
-      res.json(response)
+      // TODO monstrar id do usuario também
+      res.json(decryptedUsers);
     } catch (error) {
-      console.log(error)
-      res.status(500).json({msg: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"})
+      console.log(error);
+      res.status(500).json({ msg: "Aconteceu um erro no servidor, tente novamente mais tarde" });
     }
   },
 
@@ -194,14 +213,13 @@ const usuarioController = {
       // update user fields
       usuario.nome = encryptedName;
       usuario.email = encryptedEmail;
-      // usuario.perfil = encryptedRole;
       usuario.empresa = encrypteCompany;
       usuario.contato_empresa = encrypteCompanyContact;
       usuario.senha = encryptePassword;
 
       // save updated user
       await usuario.save();
-      
+
       res.status(200).json({ msg: 'Os dados do usuário foram criptografados' });
 
       // Excluir a chave de criptografia após criptografar os dados
@@ -305,7 +323,6 @@ const usuarioController = {
         res.status(500).json({ msg: "Aconteceu um erro no servidor, tente novamente mais tarde" });
     }
   },
-
 }
 
   // Função para criptografar os dados do usuário
@@ -318,15 +335,20 @@ const usuarioController = {
   async function decryptUserDataField(user) {
     const crypto = await Crypto.findOne({ usuario: user._id });
 
-    console.log("user", user);
-    console.log("crypto", crypto);
-  
-    const name = CryptoJS.AES.decrypt(user.name, crypto.cryptoKey).toString();
+    if (!crypto) {
+      throw new Error('Usuário não encontrado');
+    }
 
-    console.log("name huehueh", name);
-    return user;
+    const nome = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(user.nome, crypto.cryptoKey));
+    const email = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(user.email, crypto.cryptoKey));
+    const empresa = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(user.empresa, crypto.cryptoKey));
+    const contato_empresa = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(user.contato_empresa, crypto.cryptoKey));
+
+    const decryptedUser = { ...user, nome, email, empresa, contato_empresa};
+
+    return decryptedUser;
   }
-  
+
   // Função para excluir a chave de criptografia
   async function deleteCryptographicKey(crypto) {
     await Crypto.findByIdAndDelete(crypto._id);

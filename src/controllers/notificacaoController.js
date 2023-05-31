@@ -4,7 +4,6 @@ const RO = require("../models/RO")
 require('dotenv').config()
 
 function sendEmail (email) {
-    console.log(email)
     const transportador = nodemailer.createTransport({
         host: process.env.HOST_EMAIL,
         port: process.env.PORT_EMAIL,

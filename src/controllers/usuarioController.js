@@ -48,8 +48,15 @@ const usuarioController = {
     });
 
     try {
-      await usuario.save()
-      await crypto.save();
+      const userCreated = await usuario.save();
+
+      crypto.save().then((crypto) => {
+        userCreated.nome = encryptUserDataField(userCreated.nome, crypto);
+        userCreated.email = encryptUserDataField(userCreated.email, crypto);
+        userCreated.empresa = encryptUserDataField(userCreated.empresa, crypto);
+        userCreated.contato_empresa = encryptUserDataField(userCreated.contato_empresa, crypto);
+        userCreated.save();
+      });
       
       // Enviando e-mail para o usuário redefinir a senha
       transporter.sendMail({
@@ -75,7 +82,7 @@ const usuarioController = {
           return res.status(422).json({msg: 'Erro ao enviar o email'})
       })
 
-      res.status(201).json({msg: `Usuário criado com sucesso `}) // TODO retornar id
+      res.status(201).json({user_id: userCreated.id, msg: `Usuário criado com sucesso `}) // TODO retornar id
     } catch (error) {
       console.log(error)
       res.status(500).json({msg: "Aconteceu um erro no servidor, tente novamente mais tarde"})
@@ -119,6 +126,9 @@ const usuarioController = {
       if (!usuario) {
           return res.status(404).json({ msg: 'Usuário não encontrado' });
       }
+
+      const decryptedUser = await decryptUserDataField(usuario);
+      console.log("Decrypted user", decryptedUser);
 
       res.status(200).json(usuario);
     } catch (error) {
@@ -304,6 +314,19 @@ const usuarioController = {
     return encryptedData;
   }
 
+  // Função para descriptografar os dados do usuário
+  async function decryptUserDataField(user) {
+    const crypto = await Crypto.findOne({ usuario: user._id });
+
+    console.log("user", user);
+    console.log("crypto", crypto);
+  
+    const name = CryptoJS.AES.decrypt(user.name, crypto.cryptoKey).toString();
+
+    console.log("name huehueh", name);
+    return user;
+  }
+  
   // Função para excluir a chave de criptografia
   async function deleteCryptographicKey(crypto) {
     await Crypto.findByIdAndDelete(crypto._id);

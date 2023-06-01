@@ -36,11 +36,11 @@ const dashboardController = {
 
                 if (date) {
                     if (meses[mes] === mesFiltro && ano === anoFiltro) {
-                        if (!ro.suporte || ro.suporte.status === 'pendente') {
+                        if (!ro.suporte || ro.suporte.fase === 'pendente') {
                             aberto++
-                        } else if (ro.suporte.status === 'andamento' || ro.suporte.status === 'validacao') {
+                        } else if (ro.suporte.fase === 'andamento' || ro.suporte.fase === 'validacao') {
                             andamento++
-                        } else if (ro.suporte.status === 'concluido') {
+                        } else if (ro.suporte.fase === 'concluido') {
                             fechado++
                         }
                     }
@@ -64,7 +64,6 @@ const dashboardController = {
             for (let i = 0; i < ros.length; i++) {
                 const ro = ros[i]
                 const mes = ro.dataRegistro.getMonth()
-                console.log(mes)
                 const ano = ro.dataRegistro.getFullYear()
 
                 if (dates.indexOf(`${meses[mes]} de ${ano}`) === -1) {

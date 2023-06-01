@@ -6,4 +6,6 @@ router.route("/:id").get((req, res) => notificacaoController.mostrarNotificacoes
 
 router.route("/").post((req, res) => notificacaoController.marcarNotificacoes(req, res))
 
+router.route("/email").patch((req, res) => notificacaoController.notificacaoEmail(req, res))
+
 module.exports = router

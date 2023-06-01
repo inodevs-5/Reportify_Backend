@@ -29,6 +29,10 @@ const usuarioSchema = new Schema({
         senha: {
             type: String,
         },
+        email_notificacao:{
+            type: Boolean,
+            default: true
+        },
         notificacoes: [{
             colaboradoIACIT:{
                 type: Schema.Types.ObjectId,

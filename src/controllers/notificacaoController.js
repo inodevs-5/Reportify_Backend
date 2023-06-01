@@ -31,8 +31,6 @@ const emailNotificacao = {
 
             const ro = await RO.findById(_id).populate(["relator.id"])
 
-            console.log(Usuario.notificacoes) 
-
             usuario.notificacoes.push({
                 idRo: _id,
                 mensagem: `Registro de Ocorrência ${ro._id} cadastrado`,
@@ -44,27 +42,30 @@ const emailNotificacao = {
             if (!usuario) {
                 return { error: 'Usuário não encontrado' };
             }
-            
-            const cadastroRO = {
-                from: `Inodevs <${process.env.USER_EMAIL}>`,
-                to: usuario.email,
-                subject: 'Novo Registro de Ocorrência cadastrado',
-                html: `
-                    <h1>RO ${ro._id}</h1>
-                    <p>Olá senhor(a) ${ro.relator.id.nome}, esse email foi enviado para lhe informar que o Registro de Ocorrência ${ro._id}, foi cadastrado com sucesso.
-                        Agora basta esperar, que logo um de nossos colaboradores irá resolve-lo, e quando isso ocorrer você receberá uma notificação nesse mesmo e-mail</p>
-                        <p><strong>Status atual: </strong>Pendente </p>
-                        </br></br>
-                        <p>Informações cadastrados do Registro de Ocorrência:</p>
-                    <ul>
-                        <li><strong>Nome: </strong>${ro.relator.id.nome}</li>
-                        <li><strong>Tipo: </strong>${ro.classDefeito}</li>
-                        <li><strong>Título do RO: </strong>${ro.tituloOcorrencia}</li>
-                        <li><strong>Descrição: </strong>${ro.descricaoOcorrencia}</li>
-                    </ul> 
-                `
+
+            if(usuario.email_notificacao === true){
+                const cadastroRO = {
+                    from: `Inodevs <${process.env.USER_EMAIL}>`,
+                    to: usuario.email,
+                    subject: 'Novo Registro de Ocorrência cadastrado',
+                    html: `
+                        <h1>RO ${ro._id}</h1>
+                        <p>Olá senhor(a) ${ro.relator.id.nome}, esse email foi enviado para lhe informar que o Registro de Ocorrência ${ro._id}, foi cadastrado com sucesso.
+                            Agora basta esperar, que logo um de nossos colaboradores irá resolve-lo, e quando isso ocorrer você receberá uma notificação nesse mesmo e-mail</p>
+                            <p><strong>Status atual: </strong>Pendente </p>
+                            </br></br>
+                            <p>Informações cadastrados do Registro de Ocorrência:</p>
+                        <ul>
+                            <li><strong>Nome: </strong>${ro.relator.id.nome}</li>
+                            <li><strong>Tipo: </strong>${ro.classDefeito}</li>
+                            <li><strong>Título do RO: </strong>${ro.tituloOcorrencia}</li>
+                            <li><strong>Descrição: </strong>${ro.descricaoOcorrencia}</li>
+                        </ul> 
+                    `
+                }
+                sendEmail(cadastroRO)
             }
-            sendEmail(cadastroRO)
+
          // <li><strong>data do registro: </strong>${ro.dataRegistro}</li>
         } catch (error) {
             console.log(error)
@@ -96,36 +97,38 @@ const emailNotificacao = {
 
             await usuario_adm.save()
 
-            if (!usuario) {
+            if (!usuario || !usuario_adm) {
                 return { error: 'Usuário não encontrado' };
             }
-            
-            const RoAtendido = {
-                from: `Inodevs <${process.env.USER_EMAIL}>`,
-                to: usuario.email,
-                subject: 'Alteração do status do registro de ocorrência',
-                html: `
-                    <h1>RO ${ro._id}</h1>
-                    <p>Olá senhor(a) ${usuario.nome}, esse email foi enviado para lhe informar que o RO ${ro._id}, foi atendido.
-                        Entre no aplicativo para confirmar se o atendimente resolve seu problema</p>
-                        <p><strong>Status atual: </strong>Atendido</p>
-                `
+
+            if (Usuario.email_notificacao === true){
+                const RoAtendido = {
+                    from: `Inodevs <${process.env.USER_EMAIL}>`,
+                    to: usuario.email,
+                    subject: 'Alteração do status do registro de ocorrência',
+                    html: `
+                        <h1>RO ${ro._id}</h1>
+                        <p>Olá senhor(a) ${usuario.nome}, esse email foi enviado para lhe informar que o RO ${ro._id}, foi atendido.
+                            Entre no aplicativo para confirmar se o atendimente resolve seu problema</p>
+                            <p><strong>Status atual: </strong>Atendido</p>
+                    `
+                }
+    
+                const RoAtendidoAdm = {
+                    from: `Inodevs <${process.env.USER_EMAIL}>`,
+                    to: usuario_adm.email,
+                    subject: 'teste de envio de email',
+                    html:  `
+                        <h1>RO ${ro._id}</h1>
+                        <p>Olá senhor(a) ${usuario_adm.nome}, esse email foi enviado para lhe informar que o RO ${ro._id} que você atendeu, já foi encaminhado para o relator.</p>
+                            <p><strong>Status atual: </strong>Atendido</p>
+                    `
+                }
+    
+                sendEmail(RoAtendido)
+    
+                sendEmail(RoAtendidoAdm)
             }
-
-            const RoAtendidoAdm = {
-                from: `Inodevs <${process.env.USER_EMAIL}>`,
-                to: usuario_adm.email,
-                subject: 'teste de envio de email',
-                html:  `
-                    <h1>RO ${ro._id}</h1>
-                    <p>Olá senhor(a) ${usuario_adm.nome}, esse email foi enviado para lhe informar que o RO ${ro._id} que você atendeu, já foi encaminhado para o relator.</p>
-                        <p><strong>Status atual: </strong>Atendido</p>
-                `
-            }
-
-            sendEmail(RoAtendido)
-
-            sendEmail(RoAtendidoAdm)
         } catch (error) {
             console.log(error)
             return {error: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"}
@@ -160,32 +163,36 @@ const emailNotificacao = {
                 return { error: 'Usuário não encontrado' };
             }
 
-            const RoFechado = {
-                from: `Inodevs <${process.env.USER_EMAIL}>`,
-                to: usuario.email,
-                subject: 'Registro de Ocorrência encerrado',
-                html: `
+            if (Usuario.email_notificacao === true){
+                const RoFechado = {
+                    from: `Inodevs <${process.env.USER_EMAIL}>`,
+                    to: usuario.email,
+                    subject: 'Registro de Ocorrência encerrado',
+                    html: `
+                        <h1>RO ${ro._id}</h1>
+                        <p>Olá senhor(a) ${usuario.nome}, esse email foi enviado para lhe informar que o RO ${ro._id}, foi concluído.
+                            Qualquer erro entre em contato com algum colaborador via chat</p>
+                            <p><strong>Status atual: </strong>Concluído</p>
+                    `
+                }
+    
+                const RoFechadoAdm = {
+                    from: `Inodevs <${process.env.USER_EMAIL}>`,
+                    to: usuario_adm.email,
+                    subject: 'Registro de Ocorrência encerrado',
+                    html:  `
                     <h1>RO ${ro._id}</h1>
-                    <p>Olá senhor(a) ${usuario.nome}, esse email foi enviado para lhe informar que o RO ${ro._id}, foi concluído.
-                        Qualquer erro entre em contato com algum colaborador via chat</p>
+                    <p>Olá senhor(a) ${usuario_adm.nome}, esse email foi enviado para lhe informar que o RO ${ro._id} que você atendeu, foi fechado, pois atendeu o problema do relator.</p>
                         <p><strong>Status atual: </strong>Concluído</p>
                 `
+                }
+    
+                sendEmail(RoFechado)
+    
+                sendEmail(RoFechadoAdm)
             }
 
-            const RoFechadoAdm = {
-                from: `Inodevs <${process.env.USER_EMAIL}>`,
-                to: usuario_adm.email,
-                subject: 'Registro de Ocorrência encerrado',
-                html:  `
-                <h1>RO ${ro._id}</h1>
-                <p>Olá senhor(a) ${usuario_adm.nome}, esse email foi enviado para lhe informar que o RO ${ro._id} que você atendeu, foi fechado, pois atendeu o problema do relator.</p>
-                    <p><strong>Status atual: </strong>Concluído</p>
-            `
-            }
 
-            sendEmail(RoFechado)
-
-            sendEmail(RoFechadoAdm)
         } catch (error) {
             console.log(error)
             return {error: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"}
@@ -220,6 +227,18 @@ const emailNotificacao = {
         notificacao.save()
       
         res.status(200).json({notificacao, msg: "Notificações visualizadas com sucesso."})
+    },
+
+    notificacaoEmail: async function notificacaoEmailEnvio(req, res) {
+        const { id } = req.body
+
+        const notificacao_email = await Usuario.findOne({ _id: id});
+
+        notificacao_email.email_notificacao = !notificacao_email.email_notificacao
+
+        notificacao_email.save()
+        
+        res.status(200).json({notificacao_email, msg: "Status do Envio de notificações atualizado com sucesso."})
     }
 }
 

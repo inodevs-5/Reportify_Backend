@@ -204,37 +204,10 @@ const usuarioController = {
         return res.status(404).json({ msg: 'key de criptografia não encontrada para o usuário.' });
       }
 
-      const userData = {
-        nome: usuario.nome,
-        email: usuario.email,
-        empresa: usuario.empresa,
-        contato_empresa: usuario.contato_empresa,
-        senha: usuario.senha,
-      };
-
-      // Criptografar cada dado do usuário separadamente
-      const encryptedName = encryptUserDataField(userData.nome, crypto);
-      const encryptedEmail = encryptUserDataField(userData.email, crypto);
-      const encrypteCompany = encryptUserDataField(userData.empresa, crypto);
-      const encrypteCompanyContact = encryptUserDataField(userData.contato_empresa, crypto);
-      const encryptePassword = encryptUserDataField(userData.senha, crypto);
-
-      // update user fields
-      usuario.nome = encryptedName;
-      usuario.email = encryptedEmail;
-      usuario.empresa = encrypteCompany;
-      usuario.contato_empresa = encrypteCompanyContact;
-      usuario.senha = encryptePassword;
-
-      // save updated user
-      await usuario.save();
-
-      res.status(200).json({ msg: 'Os dados do usuário foram criptografados' });
-
       // Excluir a chave de criptografia após criptografar os dados
       deleteCryptographicKey(crypto);
 
-      console.log('Dados criptografados');
+      res.status(200).json({ msg: 'Anonimizado pela LGPD'});
     } catch (error) {
       console.log(error);
       res.status(500).json({ msg: "Aconteceu um erro no servidor, tente novamente mais tarde" });

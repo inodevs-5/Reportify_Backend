@@ -57,11 +57,7 @@ const usuarioController = {
         userCreated.contato_empresa = encryptUserDataField(userCreated.contato_empresa, crypto);
         userCreated.save();
       });
-<<<<<<< HEAD
 
-=======
-      
->>>>>>> 05cfe0db5311af84420fd95796587fb985f43f94
       // Enviando e-mail para o usuário redefinir a senha
       transporter.sendMail({
           from: `Inodevs <${process.env.USER_EMAIL}>`,

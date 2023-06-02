@@ -121,19 +121,27 @@ const usuarioController = {
     const { id } = req.params;
 
     try {
+      // find user by id
       const usuario = await Usuario.findById(id);
-
       if (!usuario) {
-          return res.status(404).json({ msg: 'Usuário não encontrado' });
+        return res.status(404).json({ msg: 'Usuário não encontrado' });
+      }
+
+      // find the user's encryption key
+      const crypto = await Crypto.findOne({ usuario: id });
+      if (!crypto) {
+        return res.status(404).json({ msg: 'Anonimizado pela LGPD.' });
       }
 
       const decryptedUser = await decryptUserDataField(usuario);
+      const user_id = decryptedUser.user_id;
       const nomeUsuario = decryptedUser.nome;
       const emailUsuario = decryptedUser.email;
       const empresaUsuario = decryptedUser.empresa;
       const contato_empresaUsuario = decryptedUser.contato_empresa;
 
       const decryptedUserData = {
+        user_id,
         nomeUsuario,
         emailUsuario,
         empresaUsuario,
@@ -144,7 +152,7 @@ const usuarioController = {
     } catch (error) {
       console.log(error);
       if (error.message === 'Usuário não encontrado') {
-        return res.status(404).json({ msg: 'Usuário não encontrado' });
+        return res.status(404).json({user_id: usuario._id, msg: 'Usuário não encontrado' });
       }
       res.status(500).json({ msg: "Aconteceu um erro no servidor, tente novamente mais tarde" });
     }

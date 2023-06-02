@@ -108,8 +108,12 @@ const usuarioController = {
       usuario.empresa = empresa || usuario.empresa;
       usuario.contato_empresa = contato_empresa || usuario.contato_empresa;
 
+      // continuar: O campo do usuario está sendo atualizado mas não esttá aparecendo na req de getOne, acredito que porque não tenha sido criptografado novamente.
+      // criptografar e testar para outros campos além do nome
+
       // save updated user
       await usuario.save();
+      console.log('---------', usuario, '---------');
       res.status(200).json({ msg: 'Usuário atualizado com sucesso' });
     } catch (error) {
       console.log(error);

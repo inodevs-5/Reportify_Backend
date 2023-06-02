@@ -172,6 +172,7 @@ const usuarioController = {
         if (key) {
           const decryptedUser = await decryptUserDataField(usuario, key);
           decryptedUsers.push({
+            user_id: decryptedUser.user_id,
             nome: decryptedUser.nome,
             email: decryptedUser.email,
             empresa: decryptedUser.empresa,

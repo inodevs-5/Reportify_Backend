@@ -339,12 +339,13 @@ const usuarioController = {
       throw new Error('Usuário não encontrado');
     }
 
+    const user_id = user._id;
     const nome = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(user.nome, crypto.cryptoKey));
     const email = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(user.email, crypto.cryptoKey));
     const empresa = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(user.empresa, crypto.cryptoKey));
     const contato_empresa = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(user.contato_empresa, crypto.cryptoKey));
 
-    const decryptedUser = { ...user, nome, email, empresa, contato_empresa};
+    const decryptedUser = { ...user, user_id, nome, email, empresa, contato_empresa};
 
     return decryptedUser;
   }

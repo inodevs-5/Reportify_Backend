@@ -6,7 +6,7 @@ const CryptoJS = require("crypto-js");
 
 const usuarioController = {
 
-  create: async(req, res) => {
+  create: async(req, res) => { // corrigir erro no console ao enviar a req
     const {nome, email, perfil, empresa, contato_empresa} = req.body
 
     // validations
@@ -94,27 +94,42 @@ const usuarioController = {
     const { nome, email, perfil, empresa, contato_empresa } = req.body;
 
     try {
-        // find user by id
+      // find user by id
       const usuario = await Usuario.findById(id);
-
       if (!usuario) {
-          return res.status(404).json({ msg: 'Usuário não encontrado' });
+        return res.status(404).json({ msg: 'Usuário não encontrado' });
       }
 
-      // update user fields
-      usuario.nome = nome || usuario.nome;
-      usuario.email = email || usuario.email;
-      usuario.perfil = perfil || usuario.perfil;
-      usuario.empresa = empresa || usuario.empresa;
-      usuario.contato_empresa = contato_empresa || usuario.contato_empresa;
+      // find the user's encryption key
+      const crypto = await Crypto.findOne({ usuario: id });
+      if (!crypto) {
+        return res.status(404).json({ msg: 'Anonimizado pela LGPD.' });
+      }
 
-      // continuar: O campo do usuario está sendo atualizado mas não esttá aparecendo na req de getOne, acredito que porque não tenha sido criptografado novamente.
-      // criptografar e testar para outros campos além do nome
+      usuario.nome = nome ? encryptUserDataField(nome, crypto) : usuario.nome;
+      usuario.email = email ? encryptUserDataField(email, crypto) : usuario.email;
+      usuario.perfil = perfil ? encryptUserDataField(perfil, crypto) : usuario.perfil;
+      usuario.empresa = empresa ? encryptUserDataField(empresa, crypto) : usuario.empresa;
+      usuario.contato_empresa = contato_empresa ? encryptUserDataField(contato_empresa, crypto) : usuario.contato_empresa;
 
-      // save updated user
-      await usuario.save();
-      console.log('---------', usuario, '---------');
-      res.status(200).json({ msg: 'Usuário atualizado com sucesso' });
+      const updatedUser = await usuario.save();
+
+      const decryptedUser = await decryptUserDataField(updatedUser);
+      const user_id = decryptedUser.user_id;
+      const nomeUsuario = decryptedUser.nome;
+      const emailUsuario = decryptedUser.email;
+      const empresaUsuario = decryptedUser.empresa;
+      const contato_empresaUsuario = decryptedUser.contato_empresa;
+
+      const decryptedUserData = {
+        user_id,
+        nomeUsuario,
+        emailUsuario,
+        empresaUsuario,
+        contato_empresaUsuario,
+      }
+
+      res.status(200).json({ user_id: usuario._id, msg: 'Usuário atualizado com sucesso', decryptedUserData});
     } catch (error) {
       console.log(error);
       res.status(500).json({ msg: "Aconteceu um erro no servidor, tente novamente mais tarde" });

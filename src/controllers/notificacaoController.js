@@ -1,6 +1,8 @@
 const nodemailer = require('nodemailer')
 const { Usuario } = require("../models/Usuario")
 const RO = require("../models/RO")
+const { EmailLog } = require("../models/EmailLog")
+const mongoose = require('mongoose')
 require('dotenv').config()
 
 function sendEmail (email) {
@@ -239,7 +241,28 @@ const emailNotificacao = {
         notificacao_email.save()
         
         res.status(200).json({notificacao_email, msg: "Status do Envio de notificações atualizado com sucesso."})
-    }
+    },
+
+    accept: async function envioEmail(req, res) {
+        try {
+            const { id } = req.body
+
+            const notificacao_email = await Usuario.findOne({ _id: id});
+
+            const emailNotif  = notificacao_email.email_notificacao
+
+            const usuario = new mongoose.Types.ObjectId(id)
+
+            const emailLog = new EmailLog({usuario, emailNotif})
+
+            emailLog.save()
+
+            res.status(201).json({msg: 'Status', emailLog})
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({msg: "Aconteceu um erro no servidor, tente novamente mais tarde"})     
+        }
+    },
 }
 
 

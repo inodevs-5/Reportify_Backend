@@ -30,7 +30,8 @@ const mensagemController = {
                 return res.status(422).json({ msg: 'Destinatario não encontrado'})
             }
 
-            const mensagem = new Mensagem({destinatario, remetente, conteudo})
+            const mensagem = new Mensagem({destinatario, remetente, conteudo, mensagem:false})
+            
 
             await mensagem.save()
     
@@ -71,6 +72,40 @@ const mensagemController = {
             res.status(500).json({msg: "Aconteceu um erro no servidor, tente novamente mais tarde"})     
         }
     },
+
+    mostrarNotificacoesChat: async function mostrarNumeroNotificacoesChat(req, res)  {
+        try {
+            const { id } = req.params
+
+            const notificacaoChat = await Mensagem.find({ destinatario: id});
+
+            let numeroNotificacoeschat = 0
+            for (let n = 0; n < notificacaoChat.length; n++) {
+                if (notificacaoChat[n].mensagem === false){
+                    numeroNotificacoeschat++
+                }
+            }
+            res.status(200).json({numeroNotificacoeschat})
+        } catch (error) {
+            console.log(error)
+        }
+    },
+    
+    marcarNotificacoesChat: async function marcarNotificacoesVistasChat(req, res) {
+        const { id } = req.body
+
+        const notificacaoChat = await Mensagem.find({ destinatario: id});
+
+        for (let n = 0; n < notificacaoChat.length; n++) {
+            if (notificacaoChat[n].mensagem === false){
+                notificacaoChat[n].mensagem = true
+            }
+            notificacaoChat[n].save()
+        }
+      
+        res.status(200).json({notificacaoChat, msg: "Notificações visualizadas com sucesso."})
+    }
+
 }
 
 

@@ -14,7 +14,7 @@ router.route("/").post(upload.array('anexo'), (req, res) => roController.create(
 
 router.route("/search/:search").get((req, res) => roController.search(req, res))
 
-router.route("/download/:id").get((req, res) => roController.download(req, res))
+router.route("/download/:filename").get((req, res) => roController.download(req, res))
 
 router.route("/:id").get((req, res) => roController.get(req, res))
 
@@ -27,5 +27,7 @@ router.route("/close/:id").patch((req, res) => roController.close(req, res))
 router.route("/relator/search/:id/:search").get((req, res) => roController.searchRelator(req, res))
 
 router.route("/atribuido/search/:id/:search").get((req, res) => roController.searchAtribuido(req, res))
+
+router.route("/image/:filename").get((req, res) => roController.getImage(req, res))
 
 module.exports = router

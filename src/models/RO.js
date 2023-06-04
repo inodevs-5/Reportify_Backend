@@ -102,9 +102,12 @@ const roSchema = new Schema({
         },        
         validacaoFechamentoRo: {
             type: String,
-            enum: ['Encerrado', 'Aberto'],
+            enum: ['Aberto', 'Encerrado', 'Recusado'],
             default: 'Aberto'
         },
+        justificativaFechamento: {
+            type: String
+        }
     },
 )
 

@@ -29,6 +29,10 @@ const usuarioSchema = new Schema({
         senha: {
             type: String,
         },
+        email_notificacao:{
+            type: Boolean,
+            default: true
+        },
         notificacoes: [{
             colaboradoIACIT:{
                 type: Schema.Types.ObjectId,
@@ -46,6 +50,9 @@ const usuarioSchema = new Schema({
                 required: true,
                 default: new Date().toLocaleString("en-US", {timezone: 'America/Sao_Paulo'})
             },
+            visualizar:{
+                type: Boolean
+            }
         }]
     }
 )

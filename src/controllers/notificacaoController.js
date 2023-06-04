@@ -105,7 +105,7 @@ const emailNotificacao = {
                     return { error: 'Usuário não encontrado' };
                 }
 
-                if (Usuario.email_notificacao === true){
+                if (usuario.email_notificacao === true){
                     const RoAtendido = {
                         from: `Inodevs <${process.env.USER_EMAIL}>`,
                         to: usuario.email,
@@ -121,7 +121,7 @@ const emailNotificacao = {
                     const RoAtendidoAdm = {
                         from: `Inodevs <${process.env.USER_EMAIL}>`,
                         to: usuario_adm.email,
-                        subject: 'teste de envio de email',
+                        subject: 'Alteração do status do registro de ocorrência',
                         html:  `
                             <h1>RO ${ro._id}</h1>
                             <p>Olá senhor(a) ${usuario_adm.nome}, esse email foi enviado para lhe informar que o RO ${ro._id} que você atendeu, já foi encaminhado para o relator.</p>
@@ -152,20 +152,22 @@ const emailNotificacao = {
             let RoFechado = {
                 from: `Inodevs <${process.env.USER_EMAIL}>`,
                 to: usuario.email,
-                subject: 'Registro de Ocorrência encerrado',
+                subject: 'Registro de Ocorrência ',
                 html: ``
             }
 
             let RoFechadoAdm = {
                 from: `Inodevs <${process.env.USER_EMAIL}>`,
                 to: usuario_adm.email,
-                subject: 'Registro de Ocorrência encerrado',
+                subject: 'Registro de Ocorrência ',
                 html:  ``
+            }
+
             if (validacaoFechamentoRo === "Encerrado") {
 
                 usuario.notificacoes.push({
                     idRo: _id,
-                    mensagem: `Registro de Ocorrência ${ro._id} fechado`,
+                    mensagem: `Registro de Ocorrência ${ro._id} encerrado`,
                     visualizar: false
                 })
     
@@ -173,7 +175,7 @@ const emailNotificacao = {
     
                 usuario_adm.notificacoes.push({
                     idRo: _id,
-                    mensagem: `Registro de Ocorrência ${ro._id} fechado`,
+                    mensagem: `Registro de Ocorrência ${ro._id} encerrado`,
                     visualizar: false
                 })
     
@@ -183,7 +185,9 @@ const emailNotificacao = {
                     return { error: 'Usuário não encontrado' };
                 }
               
-                if (Usuario.email_notificacao === true){
+                if (usuario.email_notificacao === true){
+
+                    RoFechado.subject += 'encerrado'
                     RoFechado.html = `
                         <h1>RO ${ro._id}</h1>
                         <p>Olá senhor(a) ${usuario.nome}, esse email foi enviado para lhe informar que o RO ${ro._id} foi concluído.
@@ -191,6 +195,7 @@ const emailNotificacao = {
                             <p><strong>Status atual: </strong>Concluído</p>
                     `
 
+                    RoFechadoAdm.subject += 'encerrado'
                     RoFechadoAdm.html = `
                         <h1>RO ${ro._id}</h1>
                         <p>Olá senhor(a) ${usuario_adm.nome}, esse email foi enviado para lhe informar que o RO ${ro._id} que você atendeu foi fechado, pois atendeu o problema do relator.</p>
@@ -205,7 +210,7 @@ const emailNotificacao = {
               
                 usuario.notificacoes.push({
                     idRo: _id,
-                    mensagem: `Registro de Ocorrência ${ro._id} fechado`,
+                    mensagem: `Registro de Ocorrência ${ro._id} recusado`,
                     visualizar: false
                 })
     
@@ -219,8 +224,9 @@ const emailNotificacao = {
 
                 await usuario_adm.save()
               
-                if (Usuario.email_notificacao === true){
-              
+                if (usuario.email_notificacao === true){
+
+                    RoFechado.subject += 'recusado'
                     RoFechado.html = `
                         <h1>RO ${ro._id}</h1>
                         <p>Olá senhor(a) ${usuario.nome}, esse email foi enviado para lhe informar que você recusou o RO ${ro._id} e ele foi enviado novamente para um colaborador fazer a revisão.
@@ -228,6 +234,7 @@ const emailNotificacao = {
                             <p><strong>Status atual: </strong>Em andamento</p>
                     `
 
+                    RoFechadoAdm.subject += 'recusado'
                     RoFechadoAdm.html = `
                         <h1>RO ${ro._id}</h1>
                         <p>Olá senhor(a) ${usuario_adm.nome}, esse email foi enviado para lhe informar que o RO ${ro._id} que você atendeu, foi recusado pelo relator, pois o problema não foi solucionado.</p>

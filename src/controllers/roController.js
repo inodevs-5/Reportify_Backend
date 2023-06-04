@@ -442,7 +442,7 @@ const roController = {
                 ro.justificativaFechamento = justificativaFechamento
                 ro.suporte.fase = "andamento"
             } else {
-                res.status(422).json({msg: "Justifique o motivo da rejeição do RO"})
+                return res.status(422).json({msg: "Justifique o motivo da rejeição do RO"})
             }
         }
 

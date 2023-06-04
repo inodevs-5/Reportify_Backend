@@ -22,6 +22,7 @@ Este README contém as informações necessárias para a execução do back-end 
 - Copie a string gerada e crie no repositório do projeto um arquivo .env, e dentro do arquivo cole o link. Deverá ficar dessa forma:
 ```
 DB_URL_MAIN = link_mongodb
+DB_URL_SECOND_DB = link_mongodb
 SECRET = inodevs2k23
 ```
 **Obs.:** Colocar o username e o password no link do banco.

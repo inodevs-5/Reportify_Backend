@@ -18,4 +18,4 @@ app.listen(port, function() {
     console.log("Servidor rodando na porta", port)
 })
 
-dbBackup()
+// dbBackup()

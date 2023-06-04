@@ -206,14 +206,14 @@ const roController = {
 
     download: async(req, res) => {
         try {
-            const { id } = req.params
+            const { filename } = req.params
             
-            gfs.find({ _id: new mongoose.Types.ObjectId(id) }).toArray((err, files) => {
+            gfs.find({ filename }).toArray((err, files) => {
                 if (!files[0] || files.length === 0) {
                     return res.status(200).json({msg: "Arquivo não encontrado!"});
                 }
 
-                gfs.openDownloadStream(new mongoose.Types.ObjectId(id)).pipe(res);
+                gfs.openDownloadStreamByName(filename).pipe(res);
             });
         } catch (error) {
             console.log(error)
@@ -374,7 +374,7 @@ const roController = {
         } = req.body
 
         if (ros.suporte) {
-                       ros.suporte.fase = fase || ros.suporte.fase;
+            ros.suporte.fase = fase || ros.suporte.fase;
             ros.suporte.colaboradorIACIT.id = idcolaboradorIACIT || ros.suporte.colaboradorIACIT.id;
             ros.suporte.defeito = defeito || ros.suporte.defeito
             ros.suporte.classificacao = classificacao || ros.suporte.classificacao;
@@ -382,6 +382,7 @@ const roController = {
             ros.suporte.outros = outros || ros.suporte.outros;
             ros.suporte.justificativaReclassificacao = justificativaReclassificacao || ros.suporte.justificativaReclassificacao
             ros.suporte.categoria = categoria || ros.suporte.categoria 
+            ros.justificativaReclassificacao = 'Aberto'
 
             await ros.save()
 
@@ -390,8 +391,18 @@ const roController = {
             .json({ ros, msg: "Registro de ocorrência atualizado com sucesso" });
         } else { 
             const ro = {
-                suporte: {fase,  colaboradorIACIT:{id: new mongoose.Types.ObjectId(idcolaboradorIACIT), nome}, classificacao, defeito, melhoria, outros, justificativaReclassificacao, categoria} 
+                suporte: {fase,  colaboradorIACIT:{id: new mongoose.Types.ObjectId(idcolaboradorIACIT)}, classificacao, justificativaReclassificacao, categoria} 
             };
+
+            if (classificacao === 'defeito') {
+                ro.suporte.defeito = defeito
+            }
+            if (classificacao === 'melhoria') {
+                ro.suporte.melhoria = melhoria
+            }
+            if (classificacao === 'outros') {
+                ro.suporte.outros = outros
+            }
 
             const updatedRo = await RO.findByIdAndUpdate(id, ro);
 
@@ -404,33 +415,44 @@ const roController = {
             .status(200) 
             .json({ updatedRo, msg: "Registro de ocorrência atualizado com sucesso" });
         }
-
+        
         notificacao.atendido(ros.relator.id, id, idcolaboradorIACIT)
     },
 
     close: async (req, res) => {
         const id = req.params.id;
-        const ros = await RO.findById(id);
+        const ro = await RO.findById(id);
         const {
-                validacaoFechamentoRo
+            validacaoFechamentoRo, justificativaFechamento
         } = req.body
-
-        const ro = { 
-            close: {validacaoFechamentoRo}
-        }
 
         if (!validacaoFechamentoRo) {
             return res.status(422).json({msg: 'O status do fechamento é obrigatória.'})
         }
 
-        const updatedRo = await RO.findByIdAndUpdate(id, ro);
-
-        if(!updatedRo) {
+        if(!ro) {
             res.status(404).json({ msg:"Registro de ocorrência não encontrado." });
             return;
         }
 
-        notificacao.fechado(ros.relator.id, id, ros.suporte.colaboradorIACIT.id)
+        ro.validacaoFechamentoRo = validacaoFechamentoRo
+        
+        if (validacaoFechamentoRo === 'Recusado') {
+            if (justificativaFechamento) {
+                ro.justificativaFechamento = justificativaFechamento
+                ro.suporte.fase = "andamento"
+            } else {
+                res.status(422).json({msg: "Justifique o motivo da rejeição do RO"})
+            }
+        }
+
+        if (validacaoFechamentoRo === 'Encerrado') {
+            ro.suporte.fase = 'concluido'
+        }
+
+        ro.save()
+
+        notificacao.fechado(ro.relator.id, id, ro.suporte.colaboradorIACIT.id, validacaoFechamentoRo)
 
         res
         .status(200) 
@@ -472,6 +494,18 @@ const roController = {
             res.status(500).json({msg: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"})
         }
     },
+    
+    getImage: (req, res) => {
+        gfs.find({ filename: req.params.filename }).toArray((err, files) => {
+            if (!files[0] || files.length === 0) {
+                return res.status(404).json({
+                    msg: 'Arquivo não encontrado',
+                });
+            }
+
+            res.status(200).json(files[0]);
+        });
+    }
 
 }
 

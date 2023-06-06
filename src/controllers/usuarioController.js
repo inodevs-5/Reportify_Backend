@@ -6,7 +6,7 @@ const CryptoJS = require("crypto-js");
 
 const usuarioController = {
 
-  create: async(req, res) => {
+  create: async(req, res) => { // corrigir erro no console ao enviar a req
     const {nome, email, perfil, empresa, contato_empresa} = req.body
 
     // validations
@@ -22,7 +22,7 @@ const usuarioController = {
     if (!contato_empresa) {
       return res.status(422).json({ msg: "Contato_empresa é Obrigatorio"})
     }
-    
+
     // check if user exist
     const usuarioExists = await Usuario.findOne({ email: email})
 
@@ -48,8 +48,15 @@ const usuarioController = {
     });
 
     try {
-      await usuario.save()
-      await crypto.save();
+      const userCreated = await usuario.save();
+
+      crypto.save().then((crypto) => {
+        userCreated.nome = encryptUserDataField(userCreated.nome, crypto);
+        userCreated.email = encryptUserDataField(userCreated.email, crypto);
+        userCreated.empresa = encryptUserDataField(userCreated.empresa, crypto);
+        userCreated.contato_empresa = encryptUserDataField(userCreated.contato_empresa, crypto);
+        userCreated.save();
+      });
 
       const token = CryptoJS.lib.WordArray.random(32).toString();
 
@@ -61,7 +68,7 @@ const usuarioController = {
       usuario.passwordResetExpires = now
 
       usuario.save()
-      
+
       // Enviando e-mail para o usuário redefinir a senha
       transporter.sendMail({
           from: `Inodevs <${process.env.USER_EMAIL}>`,
@@ -88,7 +95,7 @@ const usuarioController = {
           return res.status(422).json({msg: 'Erro ao enviar o email'})
       })
 
-      res.status(201).json({msg: `Usuário criado com sucesso `}) // TODO retornar id
+      res.status(201).json({user_id: userCreated.id, msg: `Usuário criado com sucesso `}) // TODO retornar id
     } catch (error) {
       console.log(error)
       res.status(500).json({msg: "Aconteceu um erro no servidor, tente novamente mais tarde"})
@@ -100,23 +107,42 @@ const usuarioController = {
     const { nome, email, perfil, empresa, contato_empresa } = req.body;
 
     try {
-        // find user by id
+      // find user by id
       const usuario = await Usuario.findById(id);
-
       if (!usuario) {
-          return res.status(404).json({ msg: 'Usuário não encontrado' });
+        return res.status(404).json({ msg: 'Usuário não encontrado' });
       }
 
-      // update user fields
-      usuario.nome = nome || usuario.nome;
-      usuario.email = email || usuario.email;
-      usuario.perfil = perfil || usuario.perfil;
-      usuario.empresa = empresa || usuario.empresa;
-      usuario.contato_empresa = contato_empresa || usuario.contato_empresa;
+      // find the user's encryption key
+      const crypto = await Crypto.findOne({ usuario: id });
+      if (!crypto) {
+        return res.status(404).json({ msg: 'Anonimizado pela LGPD.' });
+      }
 
-      // save updated user
-      await usuario.save();
-      res.status(200).json({ msg: 'Usuário atualizado com sucesso' });
+      usuario.nome = nome ? encryptUserDataField(nome, crypto) : usuario.nome;
+      usuario.email = email ? encryptUserDataField(email, crypto) : usuario.email;
+      usuario.perfil = perfil ? encryptUserDataField(perfil, crypto) : usuario.perfil;
+      usuario.empresa = empresa ? encryptUserDataField(empresa, crypto) : usuario.empresa;
+      usuario.contato_empresa = contato_empresa ? encryptUserDataField(contato_empresa, crypto) : usuario.contato_empresa;
+
+      const updatedUser = await usuario.save();
+
+      const decryptedUser = await decryptUserDataField(updatedUser);
+      const user_id = decryptedUser.user_id;
+      const nomeUsuario = decryptedUser.nome;
+      const emailUsuario = decryptedUser.email;
+      const empresaUsuario = decryptedUser.empresa;
+      const contato_empresaUsuario = decryptedUser.contato_empresa;
+
+      const decryptedUserData = {
+        user_id,
+        nomeUsuario,
+        emailUsuario,
+        empresaUsuario,
+        contato_empresaUsuario,
+      }
+
+      res.status(200).json({ user_id: usuario._id, msg: 'Usuário atualizado com sucesso', decryptedUserData});
     } catch (error) {
       console.log(error);
       res.status(500).json({ msg: "Aconteceu um erro no servidor, tente novamente mais tarde" });
@@ -127,39 +153,70 @@ const usuarioController = {
     const { id } = req.params;
 
     try {
+      // find user by id
       const usuario = await Usuario.findById(id);
-
       if (!usuario) {
-          return res.status(404).json({ msg: 'Usuário não encontrado' });
+        return res.status(404).json({ msg: 'Usuário não encontrado' });
       }
 
-      res.status(200).json(usuario);
+      // find the user's encryption key
+      const crypto = await Crypto.findOne({ usuario: id });
+      if (!crypto) {
+        return res.status(404).json({ msg: 'Anonimizado pela LGPD.' });
+      }
+
+      const decryptedUser = await decryptUserDataField(usuario);
+      const user_id = decryptedUser.user_id;
+      const nomeUsuario = decryptedUser.nome;
+      const emailUsuario = decryptedUser.email;
+      const empresaUsuario = decryptedUser.empresa;
+      const contato_empresaUsuario = decryptedUser.contato_empresa;
+
+      const decryptedUserData = {
+        user_id,
+        nomeUsuario,
+        emailUsuario,
+        empresaUsuario,
+        contato_empresaUsuario,
+      }
+
+      res.status(200).json(decryptedUserData);
     } catch (error) {
       console.log(error);
+      if (error.message === 'Usuário não encontrado') {
+        return res.status(404).json({user_id: usuario._id, msg: 'Usuário não encontrado' });
+      }
       res.status(500).json({ msg: "Aconteceu um erro no servidor, tente novamente mais tarde" });
     }
   },
 
-  getAll: async(req, res) => {
+  getAll: async (req, res) => {
     try {
-      const usuarios = await Usuario.find()
+      const usuarios = await Usuario.find();
+      const keys = await Crypto.find();
 
-      const keys = await Crypto.find()
+      const decryptedUsers = [];
 
-      const response = []
-      for (let u=0; u<usuarios.length; u++) {
-        for (let k=0; k<keys.length; k++) {
-          if (String(usuarios[u]._id) === String(keys[k].usuario)) {
-            response.push(usuarios[u])
+      for (let u = 0; u < usuarios.length; u++) {
+        const usuario = usuarios[u];
+        const key = keys.find(k => String(usuario._id) === String(k.usuario));
 
-          }
+        if (key) {
+          const decryptedUser = await decryptUserDataField(usuario, key);
+          decryptedUsers.push({
+            user_id: decryptedUser.user_id,
+            nome: decryptedUser.nome,
+            email: decryptedUser.email,
+            empresa: decryptedUser.empresa,
+            contato_empresa: decryptedUser.contato_empresa
+          });
         }
       }
-
-      res.json(response)
+      // TODO monstrar id do usuario também
+      res.json(decryptedUsers);
     } catch (error) {
-      console.log(error)
-      res.status(500).json({msg: "Oops! Ocorreu um erro no servidor, tente novamente mais tarde!"})
+      console.log(error);
+      res.status(500).json({ msg: "Aconteceu um erro no servidor, tente novamente mais tarde" });
     }
   },
 
@@ -179,38 +236,10 @@ const usuarioController = {
         return res.status(404).json({ msg: 'key de criptografia não encontrada para o usuário.' });
       }
 
-      const userData = {
-        nome: usuario.nome,
-        email: usuario.email,
-        empresa: usuario.empresa,
-        contato_empresa: usuario.contato_empresa,
-        senha: usuario.senha,
-      };
-
-      // Criptografar cada dado do usuário separadamente
-      const encryptedName = encryptUserDataField(userData.nome, crypto);
-      const encryptedEmail = encryptUserDataField(userData.email, crypto);
-      const encrypteCompany = encryptUserDataField(userData.empresa, crypto);
-      const encrypteCompanyContact = encryptUserDataField(userData.contato_empresa, crypto);
-      const encryptePassword = encryptUserDataField(userData.senha, crypto);
-
-      // update user fields
-      usuario.nome = encryptedName;
-      usuario.email = encryptedEmail;
-      // usuario.perfil = encryptedRole;
-      usuario.empresa = encrypteCompany;
-      usuario.contato_empresa = encrypteCompanyContact;
-      usuario.senha = encryptePassword;
-
-      // save updated user
-      await usuario.save();
-      
-      res.status(200).json({ msg: 'Os dados do usuário foram criptografados' });
-
       // Excluir a chave de criptografia após criptografar os dados
       deleteCryptographicKey(crypto);
 
-      console.log('Dados criptografados');
+      res.status(200).json({ msg: 'Anonimizado pela LGPD'});
     } catch (error) {
       console.log(error);
       res.status(500).json({ msg: "Aconteceu um erro no servidor, tente novamente mais tarde" });
@@ -330,13 +359,31 @@ const usuarioController = {
         res.status(500).json({ msg: "Aconteceu um erro no servidor, tente novamente mais tarde" });
     }
   },
-
 }
 
   // Função para criptografar os dados do usuário
   function encryptUserDataField(data, crypto) {
     const encryptedData = CryptoJS.AES.encrypt(data, crypto.cryptoKey).toString();
     return encryptedData;
+  }
+
+  // Função para descriptografar os dados do usuário
+  async function decryptUserDataField(user) {
+    const crypto = await Crypto.findOne({ usuario: user._id });
+
+    if (!crypto) {
+      throw new Error('Usuário não encontrado');
+    }
+
+    const user_id = user._id;
+    const nome = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(user.nome, crypto.cryptoKey));
+    const email = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(user.email, crypto.cryptoKey));
+    const empresa = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(user.empresa, crypto.cryptoKey));
+    const contato_empresa = CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(user.contato_empresa, crypto.cryptoKey));
+
+    const decryptedUser = { ...user, user_id, nome, email, empresa, contato_empresa};
+
+    return decryptedUser;
   }
 
   // Função para excluir a chave de criptografia

@@ -1,1 +1,0 @@
-{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"cnpj":{"$numberInt":"1"}},"name":"cnpj_1","background":true,"unique":true}],"uuid":"fc0ac82b136d4860aa8816ebe995c340","collectionName":"empresas","type":"collection"}

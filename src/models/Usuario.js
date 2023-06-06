@@ -29,6 +29,14 @@ const usuarioSchema = new Schema({
         senha: {
             type: String,
         },
+        passwordResetToken: {
+            type: String,
+            select: false,
+        },
+        passwordResetExpires: {
+            type: Date,
+            select: false,
+        },
         email_notificacao:{
             type: Boolean,
             default: true
@@ -48,7 +56,8 @@ const usuarioSchema = new Schema({
             data:{
                 type: Date,
                 required: true,
-                default: new Date().toLocaleString("en-US", {timezone: 'America/Sao_Paulo'})
+                // default: new Date().toLocaleString("en-US", {timezone: 'America/Sao_Paulo'}),
+                default: Date.now(),
             },
             visualizar:{
                 type: Boolean

@@ -22,7 +22,8 @@ const roSchema = new Schema({
         dataRegistro: {
             type: Date,
             required: true,
-            default: new Date().toLocaleString("en-US", {timezone: 'America/Sao_Paulo'})
+            // default: new Date().toLocaleString("en-US", {timezone: 'America/Sao_Paulo'}),
+            default: Date.now(),
         },
         classDefeito: {
             type: String,

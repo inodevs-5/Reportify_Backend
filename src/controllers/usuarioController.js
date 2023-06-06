@@ -50,6 +50,17 @@ const usuarioController = {
     try {
       await usuario.save()
       await crypto.save();
+
+      const token = CryptoJS.lib.WordArray.random(32).toString();
+
+      const now = new Date();
+
+      now.setHours(now.getHours() + 24)
+
+      usuario.passwordResetToken = token,
+      usuario.passwordResetExpires = now
+
+      usuario.save()
       
       // Enviando e-mail para o usuário redefinir a senha
       transporter.sendMail({
@@ -58,7 +69,8 @@ const usuarioController = {
           subject: "Defina sua senha no Reportify.",
           html: `
               <h2>Seja bem-vindo ao Reportify!</h2>
-              <p>Você acabou de ser cadastrado no aplicativo Reportify por um administrador do sistema. Após instalar o aplicativo no seu celular, clique <a href="http://reportify-app-inodevs-2023/senha/${usuario._id}/${true}">aqui</a> para definir a sua senha e conseguir se autenticar no aplicativo. Caso queira acessar nossa aplicação em um navegador web, clique <a href="http://localhost:5173/senha/${usuario._id}/${true}">aqui</a>.</p>
+              <p>Você acabou de ser cadastrado no aplicativo Reportify por um administrador do sistema. Após instalar o aplicativo no seu celular, clique <a href="http://reportify-app-inodevs-2023/senha/${usuario._id}/${true}">aqui</a> para definir a sua senha e conseguir se autenticar no aplicativo. Caso queira acessar nossa aplicação em um navegador web, clique <a href="http://localhost:5173/senha/${usuario._id}/${true}/${token}">aqui</a>.</p>
+              <p>O token deste link só será válido até 24h após o envio deste email.</p>
               <p>Além disso, confira abaixo as suas informações que foram salvas no nosso banco de dados:</p>
               <ul>
                   <li><strong>Nome: </strong>${usuario.nome}</li>
@@ -67,6 +79,7 @@ const usuarioController = {
                   <li><strong>Contato da Empresa: </strong>${usuario.contato_empresa}</li>
               </ul>
               <p>Estes são seus dados no sistema. Em relação a sua senha que ainda será definida por você, ela será completamente criptografada antes de ser armazenada. Caso queira alterar qualquer informação que está no nosso banco de dados, você pode enviar um e-mail de solicitação para esse mesmo endereço.</p>
+              <p>O token deste link só será válido até 24h após o envio deste email.</p>
           `
       }).then(message => {
           console.log(message)
@@ -206,13 +219,23 @@ const usuarioController = {
 
   updatePassword: async(req, res) => {
       const { id } = req.params;
-      const { senha, confirmarSenha } = req.body;
+      const { senha, confirmarSenha, token } = req.body;
 
       try {
-          const usuario = await Usuario.findById(id);
+          const usuario = await Usuario.findById(id).select('+passwordResetToken passwordResetExpires');
 
           if (!usuario) {
               return res.status(404).json({ msg: 'Usuário não encontrado' });
+          }
+
+          if (token !== usuario.passwordResetToken) {
+            return res.status(400).json({msg: 'Token inválido'})
+          }
+
+          const now = new Date()
+
+          if (now > usuario.passwordResetExpires) {
+            return res.status(400).json({msg: 'Token expirado, gere um novo token'})
           }
 
           if (senha !== confirmarSenha) {
@@ -261,13 +284,25 @@ const usuarioController = {
               return res.status(404).json({ msg: 'Email não encontrado.' });
           }
 
+          const token = CryptoJS.lib.WordArray.random(32).toString();
+
+          const now = new Date();
+
+          now.setHours(now.getHours() + 1)
+
+          usuario.passwordResetToken = token,
+          usuario.passwordResetExpires = now
+
+          usuario.save()
+
           transporter.sendMail({
               from: `Inodevs <${process.env.USER_EMAIL}>`,
               to: email,
               subject: "Email de Redefinição de Senha do Reportify.",
               html: `
                   <h2>Redefinição de Senha</h2>
-                  <p>Foi solicitado a redefinição de senha no aplicativo. Com o aplicativo instalado no seu celular, clique <a href="http://reportify-app-inodevs-2023/senha/${usuario._id}/${false}">aqui</a> para redefinir sua senha. Caso queira acessar nossa aplicação em um navegador web, clique <a href="http://localhost:5173/senha/${usuario._id}/${false}">aqui</a>.</p>
+                  <p>Foi solicitado a redefinição de senha no aplicativo. Com o aplicativo instalado no seu celular, clique <a href="http://reportify-app-inodevs-2023/senha/${usuario._id}/${false}">aqui</a> para redefinir sua senha. Caso queira acessar nossa aplicação em um navegador web, clique <a href="http://localhost:5173/senha/${usuario._id}/${false}/${token}">aqui</a>.</p>
+                  <p>O token deste link só será válido até 1h após o envio deste email.</p>
               `
           }).then(message => {
               console.log(message)
@@ -276,7 +311,7 @@ const usuarioController = {
               return res.status(422).json({msg: 'Erro ao enviar o email'})
           })
 
-          res.status(200).json({ msg: 'Solicitação de redefinição de senha enviada para ' + email + '!' });
+          res.status(200).json({ msg: 'Solicitação de redefinição de senha enviada para ' + email + '!', token });
       } catch (error) {
           console.log(error);
           res.status(500).json({ msg: "Aconteceu um erro no servidor, tente novamente mais tarde" });

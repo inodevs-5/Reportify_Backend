@@ -8,7 +8,7 @@ const path = require('path');
 let mongoToolsPath = 'C:\\Program Files\\MongoDB\\Tools\\100\\bin'
 
 // URI do banco de dados (igual do backup, mas não precisa inserir o nome do banco de dados no final)
-let dbUrl = process.env.DB_URL_MAIN
+let dbUrl = process.env.DB_URL_BACKUP
 
 // função principal que faz a restauração do backup
 const dbRestore = () => {
@@ -42,7 +42,8 @@ const dbRestore = () => {
   const backupDirPath = path.join(__dirname + '\\backup\\' + lastBackupFile);
   console.log(backupDirPath)
   // código no cmd que restaura o backup
-  let cmd = `runas /user:administrator cd ${mongoToolsPath} & mongorestore --uri=${dbUrl} --archive=${backupDirPath} --gzip`;
+  // let cmd = `runas /user:administrator cd "${mongoToolsPath} & mongorestore --uri=${dbUrl} --archive=${backupDirPath} --gzip`;
+  let cmd = `cd "${mongoToolsPath}" & mongorestore --uri="${dbUrl}" --archive="${backupDirPath}" --gzip`;
 
   // executando o código anterior
   exec(cmd, (error, stdout, stderr) => {
@@ -56,6 +57,6 @@ const dbRestore = () => {
 };
 
 
-cron.schedule('0 3 1 * *', dbRestore); // executa todo dia 1 de cada mês às 3h da manhã
+// cron.schedule('0 3 1 * *', dbRestore); // executa todo dia 1 de cada mês às 3h da manhã
 
 module.exports = {dbRestore}

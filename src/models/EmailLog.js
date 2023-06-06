@@ -13,8 +13,9 @@ const emailLogSchema = new Schema({
         required: true
     },
     aceitoEm: {
-        default: new Date().toLocaleString("en-US", {timezone: 'America/Sao_Paulo'}),
-        type: Date,
+        // default: new Date().toLocaleString("en-US", {timezone: 'America/Sao_Paulo'}),
+        default: Date.now(),
+        type: Date
     },
 });
 

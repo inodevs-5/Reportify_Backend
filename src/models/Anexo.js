@@ -11,8 +11,9 @@ const anexoSchema = new Schema({
         type: String,
     },
     criadoEm: {
-        default: new Date().toLocaleString("en-US", {timezone: 'America/Sao_Paulo'}),
-        type: Date,
+        // default: new Date().toLocaleString("en-US", {timezone: 'America/Sao_Paulo'}),
+        default: Date.now(),
+        type: Date
     },
     _id: false
 });

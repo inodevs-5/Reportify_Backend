@@ -33,6 +33,14 @@ const usuarioController = {
     // generete cryptoKey
     const cryptoKey = CryptoJS.lib.WordArray.random(32);
 
+    const token = CryptoJS.lib.WordArray.random(32).toString();
+
+    const now = new Date();
+
+    now.setHours(now.getHours() + 24)
+
+
+
     // create user
     const usuario = new Usuario({
       nome,
@@ -40,6 +48,8 @@ const usuarioController = {
       perfil,
       empresa,
       contato_empresa,
+      passwordResetToken:token,
+      passwordResetExpires:now
     });
 
     const crypto = new Crypto({
@@ -47,7 +57,7 @@ const usuarioController = {
       usuario: usuario._id
     });
 
-    try {
+    try {      
       const userCreated = await usuario.save();
 
       crypto.save().then((crypto) => {
@@ -57,17 +67,6 @@ const usuarioController = {
         userCreated.contato_empresa = encryptUserDataField(userCreated.contato_empresa, crypto);
         userCreated.save();
       });
-
-      const token = CryptoJS.lib.WordArray.random(32).toString();
-
-      const now = new Date();
-
-      now.setHours(now.getHours() + 24)
-
-      usuario.passwordResetToken = token,
-      usuario.passwordResetExpires = now
-
-      usuario.save()
 
       // Enviando e-mail para o usuário redefinir a senha
       transporter.sendMail({

@@ -24,7 +24,7 @@ if (!fs.existsSync(backupDirPath)) {
 let mongoToolsPath = 'C:\\Program Files\\MongoDB\\Tools\\100\\bin'
 
 // URI do banco de dados
-let dbUrl = process.env.DB_URL_BACKUP + "/reportify3"
+let dbUrl = process.env.DB_URL_BACKUP
 
 // URI do banco de dados de chaves
 // let dbUrlKeys = process.env.DB_URL_SECOND_DB
@@ -44,8 +44,8 @@ const dbBackup = () => {
   const backupDirPath = path.join(__dirname + '\\backup', backupDirName);
 
   // código no cmd que cria o backup
-  // let cmd = `runas /user:administrator cd ${mongoToolsPath} & mongodump --uri=${dbUrl} --archive=${backupDirPath} --gzip`;
-  let cmd = `cd "${mongoToolsPath}" & mongorestore --uri="${dbUrl}" --archive="${backupDirPath}" --gzip`;
+  let cmd = `runas /user:administrator cd ${mongoToolsPath} & mongodump --uri=${dbUrl} --archive=${backupDirPath} --gzip`;
+  // let cmd = `cd "${mongoToolsPath}" & mongorestore --uri="${dbUrl}" --archive="${backupDirPath}" --gzip`;
   // let cmdKeys = `cd ${mongoToolsPath} & mongodump --uri=${dbUrlKeys} --archive="${backupDirPath}" --gzip`;
 
   // executando o código anterior e exibindo mensagens de erro ou sucesso

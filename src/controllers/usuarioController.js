@@ -69,7 +69,7 @@ const usuarioController = {
           subject: "Defina sua senha no Reportify.",
           html: `
               <h2>Seja bem-vindo ao Reportify!</h2>
-              <p>Você acabou de ser cadastrado no aplicativo Reportify por um administrador do sistema. Após instalar o aplicativo no seu celular, clique <a href="http://reportify-app-inodevs-2023/senha/${usuario._id}/${true}">aqui</a> para definir a sua senha e conseguir se autenticar no aplicativo. Caso queira acessar nossa aplicação em um navegador web, clique <a href="http://localhost:5173/senha/${usuario._id}/${true}/${token}">aqui</a>.</p>
+              <p>Você acabou de ser cadastrado no aplicativo Reportify por um administrador do sistema. Após instalar o aplicativo no seu celular, clique <a href="http://reportify-app-inodevs-2023/senha/${usuario._id}/${true}/${token}">aqui</a> para definir a sua senha e conseguir se autenticar no aplicativo. Caso queira acessar nossa aplicação em um navegador web, clique <a href="http://localhost:5173/senha/${usuario._id}/${true}/${token}">aqui</a>.</p>
               <p>O token deste link só será válido até 24h após o envio deste email.</p>
               <p>Além disso, confira abaixo as suas informações que foram salvas no nosso banco de dados:</p>
               <ul>
@@ -301,7 +301,7 @@ const usuarioController = {
               subject: "Email de Redefinição de Senha do Reportify.",
               html: `
                   <h2>Redefinição de Senha</h2>
-                  <p>Foi solicitado a redefinição de senha no aplicativo. Com o aplicativo instalado no seu celular, clique <a href="http://reportify-app-inodevs-2023/senha/${usuario._id}/${false}">aqui</a> para redefinir sua senha. Caso queira acessar nossa aplicação em um navegador web, clique <a href="http://localhost:5173/senha/${usuario._id}/${false}/${token}">aqui</a>.</p>
+                  <p>Foi solicitado a redefinição de senha no aplicativo. Com o aplicativo instalado no seu celular, clique <a href="http://reportify-app-inodevs-2023/senha/${usuario._id}/${false}/${token}">aqui</a> para redefinir sua senha. Caso queira acessar nossa aplicação em um navegador web, clique <a href="http://localhost:5173/senha/${usuario._id}/${false}/${token}">aqui</a>.</p>
                   <p>O token deste link só será válido até 1h após o envio deste email.</p>
               `
           }).then(message => {
